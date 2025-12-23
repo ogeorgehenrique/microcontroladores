@@ -1,0 +1,197 @@
+CCS PCM C Compiler, Version 5.015, 5967               31-out-25 11:36
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PARA PIC\ledteste\ledteste.lst
+
+               ROM used:   125 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   6 (2%) at main() level
+                           7 (2%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   018
+0003:  NOP
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device ADC=16 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES NOBROWNOUT               //No brownout reset 
+.................... #FUSES NOLVP                    //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=20000000) 
+0004:  MOVLW  22
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  RETURN
+....................  
+.................... #define LED PIN_D1 
+.................... #define LED1 PIN_D2 
+.................... #define DELAY 1000 
+....................  
+....................  
+....................  
+.................... void main() 
+0018:  MOVF   03,W
+0019:  ANDLW  1F
+001A:  MOVWF  03
+001B:  BSF    03.5
+001C:  BSF    1F.0
+001D:  BSF    1F.1
+001E:  BSF    1F.2
+001F:  BCF    1F.3
+0020:  MOVLW  07
+0021:  MOVWF  1C
+0022:  BCF    03.7
+.................... { 
+....................  
+....................    //Example blinking LED program 
+....................    while(true) 
+....................    { 
+....................       output_low(LED); 
+0023:  BCF    08.1
+0024:  BCF    03.5
+0025:  BCF    08.1
+....................       delay_ms(DELAY); 
+0026:  MOVLW  04
+0027:  MOVWF  21
+0028:  MOVLW  FA
+0029:  MOVWF  22
+002A:  CALL   004
+002B:  DECFSZ 21,F
+002C:  GOTO   028
+....................       output_high(LED); 
+002D:  BSF    03.5
+002E:  BCF    08.1
+002F:  BCF    03.5
+0030:  BSF    08.1
+....................       delay_ms(DELAY); 
+0031:  MOVLW  04
+0032:  MOVWF  21
+0033:  MOVLW  FA
+0034:  MOVWF  22
+0035:  CALL   004
+0036:  DECFSZ 21,F
+0037:  GOTO   033
+....................        
+....................       output_low(LED1); 
+0038:  BSF    03.5
+0039:  BCF    08.2
+003A:  BCF    03.5
+003B:  BCF    08.2
+....................       delay_ms(DELAY); 
+003C:  MOVLW  04
+003D:  MOVWF  21
+003E:  MOVLW  FA
+003F:  MOVWF  22
+0040:  CALL   004
+0041:  DECFSZ 21,F
+0042:  GOTO   03E
+....................       output_high(LED1); 
+0043:  BSF    03.5
+0044:  BCF    08.2
+0045:  BCF    03.5
+0046:  BSF    08.2
+....................       delay_ms(DELAY); 
+0047:  MOVLW  04
+0048:  MOVWF  21
+0049:  MOVLW  FA
+004A:  MOVWF  22
+004B:  CALL   004
+004C:  DECFSZ 21,F
+004D:  GOTO   049
+....................        
+....................       output_low(LED1); 
+004E:  BSF    03.5
+004F:  BCF    08.2
+0050:  BCF    03.5
+0051:  BCF    08.2
+....................       delay_ms(DELAY); 
+0052:  MOVLW  04
+0053:  MOVWF  21
+0054:  MOVLW  FA
+0055:  MOVWF  22
+0056:  CALL   004
+0057:  DECFSZ 21,F
+0058:  GOTO   054
+....................       output_high(LED1); 
+0059:  BSF    03.5
+005A:  BCF    08.2
+005B:  BCF    03.5
+005C:  BSF    08.2
+....................       delay_ms(DELAY); 
+005D:  MOVLW  04
+005E:  MOVWF  21
+005F:  MOVLW  FA
+0060:  MOVWF  22
+0061:  CALL   004
+0062:  DECFSZ 21,F
+0063:  GOTO   05F
+....................        
+....................       output_low(LED1); 
+0064:  BSF    03.5
+0065:  BCF    08.2
+0066:  BCF    03.5
+0067:  BCF    08.2
+....................       delay_ms(DELAY); 
+0068:  MOVLW  04
+0069:  MOVWF  21
+006A:  MOVLW  FA
+006B:  MOVWF  22
+006C:  CALL   004
+006D:  DECFSZ 21,F
+006E:  GOTO   06A
+....................       output_high(LED1); 
+006F:  BSF    03.5
+0070:  BCF    08.2
+0071:  BCF    03.5
+0072:  BSF    08.2
+....................       delay_ms(DELAY); 
+0073:  MOVLW  04
+0074:  MOVWF  21
+0075:  MOVLW  FA
+0076:  MOVWF  22
+0077:  CALL   004
+0078:  DECFSZ 21,F
+0079:  GOTO   075
+007A:  BSF    03.5
+007B:  GOTO   023
+....................    } 
+....................  
+.................... } 
+007C:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F32   HS NOWDT PUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT
