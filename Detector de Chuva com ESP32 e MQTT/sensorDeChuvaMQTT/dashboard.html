@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard MQTT - Sensor de Chuva</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f0f0; }
+    #chart-container { min-width: 310px; max-width: 800px; height: 400px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { color: #333; }
+    #status { font-weight: bold; color: red; }
+  </style>
+</head>
+<body>
+
+  <h2>Monitoramento via MQTT</h2>
+  <p>Status da Conexão: <span id="status">Desconectado</span></p>
+  <div id="chart-container"></div>
+
+  <script>
+    // --- CONFIGURAÇÕES ---
+    // Coloque aqui o MESMO tópico que está no código do ESP32
+    const topicoChuva = "george/sensor/chuva"; 
+    
+    // Broker HiveMQ público via Websockets
+    const broker = "broker.hivemq.com";
+    const port = 8000; // Porta Websocket (Diferente da 1883 do ESP32)
+
+    // --- CONFIGURAÇÃO DO GRÁFICO ---
+    var chart = new Highcharts.Chart({
+      chart: { renderTo: 'chart-container', defaultSeriesType: 'spline' },
+      title: { text: 'Intensidade de Chuva (Tempo Real)' },
+      xAxis: { type: 'datetime', tickPixelInterval: 150 },
+      yAxis: { minPadding: 0.2, maxPadding: 0.2, title: { text: 'Valor (0-4095)' }, min: 0, max: 4100 },
+      series: [{ name: 'Sensor de Chuva', data: [], color: '#007bff' }],
+      credits: { enabled: false }
+    });
+
+    // --- LÓGICA MQTT ---
+    // Cria um ID único para o navegador não conflitar com o ESP32
+    var clientID = "WebClient-" + parseInt(Math.random() * 100);
+    
+    // Cria o cliente MQTT
+    var client = new Paho.MQTT.Client(broker, port, clientID);
+
+    // Define o que acontece quando conecta, perde conexão ou chega mensagem
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+
+    // Conecta ao Broker
+    client.connect({onSuccess:onConnect});
+
+    function onConnect() {
+      console.log("Conectado ao Broker!");
+      document.getElementById("status").innerText = "Conectado (Aguardando dados...)";
+      document.getElementById("status").style.color = "green";
+      
+      // Assina o tópico para começar a receber
+      client.subscribe(topicoChuva);
+    }
+
+    function onConnectionLost(responseObject) {
+      if (responseObject.errorCode !== 0) {
+        console.log("Conexão perdida: " + responseObject.errorMessage);
+        document.getElementById("status").innerText = "Conexão Perdida!";
+        document.getElementById("status").style.color = "red";
+      }
+    }
+
+    function onMessageArrived(message) {
+      console.log("Dado recebido: " + message.payloadString);
+      
+      // Converte o texto recebido para número
+      var valor = parseInt(message.payloadString);
+      
+      // Adiciona ao gráfico
+      var x = (new Date()).getTime(); // Hora atual
+      var y = valor;
+      
+      // Se tiver mais de 20 pontos, remove o primeiro (para o gráfico andar)
+      if(chart.series[0].data.length > 20) {
+        chart.series[0].addPoint([x, y], true, true);
+      } else {
+        chart.series[0].addPoint([x, y], true, false);
+      }
+    }
+  </script>
+
+</body>
+</html>
