@@ -1,0 +1,51 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+015     CCP_1
+015     CCP_1_LOW
+016     CCP_1_HIGH
+01F.6   C1OUT
+01F.7   C2OUT
+021     @delay_ms1.P1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+09B-09C @READ_PROGRAM_MEMORY8.P1
+
+ROM Allocation:
+000004  @delay_ms1
+000018  @cinit1
+000018  main
+00001D  @cinit2
+
+Project Directory:
+    C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\display7seg_1\
+
+Project Files:
+    display7_1.c                                            [29-ago-25 16:09  CRC=C9D8EA37]
+    display7_1.h                                            [29-ago-25 16:05  CRC=6F516549]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F628A.h [12-nov-13 14:34  CRC=44569924]
+
+Source signature=C1D781C8
+
+Units:
+    display7_1 (main)
+
+Compiler Settings:
+    Processor:      PIC16F628A
+    Pointer Size:   16
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   display7_1.xsym
+    Errors:      display7_1.err
+    Ext Symbols: display7_1.esym
+    INHX8:       display7_1.hex
+    Symbols:     display7_1.sym
+    List:        display7_1.lst
+    Debug/COFF:  display7_1.cof
+    Project:     display7_1.ccspjt
+    Call Tree:   display7_1.tre
+    Statistics:  display7_1.STA

@@ -1,0 +1,20 @@
+#include <display7_1.h>
+
+void main()
+{
+//output_b(0);
+   while(true){
+   /*
+   output_high(PIN_B0);
+   output_high(PIN_B2);
+   output_high(PIN_B3);
+   output_high(PIN_B5);
+   output_high(PIN_B6);
+   output_high(PIN_B4); // chave
+   */
+   output_b(0b01111101);
+   delay_ms(10);
+   output_b(0b00101011);
+   delay_ms(10);
+   }
+}

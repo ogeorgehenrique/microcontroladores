@@ -1,0 +1,94 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+004-005 @WRITE_PROGRAM_MEMORY8.P2
+008     PSP_DATA
+015     CCP_1_LOW
+015     CCP_1
+016     CCP_1_HIGH
+01B     CCP_2_LOW
+01B     CCP_2
+01C     CCP_2_HIGH
+021-022 MAIN.tempo
+023-024 MAIN.ultimo
+025-026 MAIN.decorrido
+027-028 MAIN.wait
+029     MAIN.bloco
+02A     MAIN.i
+02B     mostra_display.valor
+02B     MAIN.@SCRATCH1
+02C-02D mostra_display.tempo_ms
+02E     mostra_display.dez
+02F     mostra_display.uni
+030-031 mostra_display.t
+032     @DIV88.P1
+032     mostra_digito.valor
+032     display_off.i
+033     mostra_digito.dezena
+033     @DIV88.P1
+033     display_off.@SCRATCH1
+034     mostra_digito.i
+034     @DIV88.@SCRATCH1
+035     @delay_ms1.P1
+035     mostra_digito.@SCRATCH1
+036     @WRITEBITA.P1
+036     @MUL88.P2
+036     mostra_digito.@SCRATCH2
+037     @WRITEBITA.P1
+037     @MUL88.P2
+038-039 @WRITEBITA.P1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+09C.6   C1OUT
+09C.7   C2OUT
+10D-10E @READ_PROGRAM_MEMORY8.P1
+10D-10E @WRITE_PROGRAM_MEMORY8.P2
+
+ROM Allocation:
+000004  segmentos.call
+000008  segmentos.data
+00004E  @WRITEBITA
+00006E  display_off
+000091  estado_padrao
+0000A7  @delay_ms1
+0000BC  botao_pressionado
+0000DA  @DIV88
+0000EF  mostra_digito
+0000FB  @MUL88
+00015D  mostra_display
+00018B  @cinit1
+00018B  MAIN
+000195  @cinit2
+
+Project Directory:
+    C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\semaforo2\
+
+Project Files:
+    semaforo2.c                                             [15-nov-25 17:58  CRC=724E3235]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F877A.h [12-nov-13 14:35  CRC=81334808]
+
+Source signature=74B4C245
+
+Units:
+    semaforo2 (main)
+
+Compiler Settings:
+    Processor:      PIC16F877A
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   semaforo2.xsym
+    Errors:      semaforo2.err
+    Ext Symbols: semaforo2.esym
+    INHX8:       semaforo2.hex
+    Symbols:     semaforo2.sym
+    List:        semaforo2.lst
+    Debug/COFF:  semaforo2.cof
+    Project:     semaforo2.ccspjt
+    Call Tree:   semaforo2.tre
+    Statistics:  semaforo2.STA

@@ -1,0 +1,39 @@
+#include <7seg.h>
+
+void main()
+{
+
+   while(TRUE)
+   {
+   /*output_high(PIN_B0); //g
+   output_high(PIN_B2); //a
+   output_high(PIN_B3); //b
+   output_high(PIN_B5); //c
+   output_high(PIN_B6); //d
+   output_high(PIN_B1); //f
+   output_high(PIN_B7); //e
+   output_high(PIN_B4); //passa para o outro display
+   */
+   
+   
+      
+      if(input(pin_a1)==0){
+         //dezena
+         output_b(0b11101110);// numero 0
+         //unidade
+         delay_ms(100);
+         output_b(0b01110111);// numero 5
+         delay_ms(100);
+      }
+      else{
+         //liga os zeros 
+         output_b(0b11111110);// numero 0
+         delay_ms(10);
+         output_b(0b11101110);// numero 0
+         delay_ms(10);
+      }
+   
+   
+   }
+
+}

@@ -1,0 +1,20 @@
+D G "__PCM__" 2 24 ""5.015""
+D G "__DEVICE__" 2 24 ""
+D G "__DATE__" 2 24 ""17-nov-25""
+D G "__TIME__" 2 24 ""10:20:52""
+V L "timeout" 1 2 "int8" `35 
+F G "tc_tecla" 1 3 "int8(int8 timeout)" `34 
+V L "to" 1 4 "int8" `36 
+V L "k" 1 5 "int8" `37 
+C L "tc_tecla" 1 9 2 "FUNCTION"
+C L "tc_tecla" 1 9 1 "FUNCTION"
+C L "tc_tecla" 1 9 1 "FUNCTION"
+C L "tc_tecla" 1 9 1 "FUNCTION"
+D G "lcd_enable" 2 11 "pin_e1		" "pino enable do LCD"
+D G "lcd_rs" 2 12 "pin_e0		" "pino rs do LCD"
+D G "lcd_d4" 2 14 "pin_d4		" "pino de dados d4 do LCD"
+D G "lcd_d5" 2 15 "pin_d5		" "pino de dados d5 do LCD"
+D G "lcd_d6" 2 16 "pin_d6		" "pino de dados d6 do LCD"
+D G "lcd_d7" 2 17 "pin_d7		" "pino de dados d7 do LCD"
+D G "lcd_type" 2 20 "2" "0=5x7, 1=5x10, 2=2 linhas"
+D G "lcd_seg_lin" 2 21 "0x40" "Endereço da segunda linha na RAM do LCD"

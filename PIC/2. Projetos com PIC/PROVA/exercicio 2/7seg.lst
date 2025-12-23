@@ -1,0 +1,207 @@
+CCS PCM C Compiler, Version 5.015, 5967               21-nov-25 15:47
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PROVA\exercicio 2\7seg.lst
+
+               ROM used:   112 words (5%)
+                           Largest free fragment is 1936
+               RAM used:   6 (3%) at main() level
+                           6 (3%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   018
+0003:  NOP
+.................... #include <7seg.h> 
+.................... #include <16F628A.h> 
+.................... //////////// Standard Header file for the PIC16F628A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F628A 
+....................  
+.................... #list 
+....................  
+....................  
+.................... #FUSES NOWDT                 	//No Watch Dog Timer 
+.................... #FUSES NOBROWNOUT            	//No brownout reset 
+.................... #FUSES NOLVP                 	//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=20000000) 
+0004:  MOVLW  21
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  RETURN
+....................  
+....................  
+....................  
+.................... void main() 
+0018:  MOVF   03,W
+0019:  ANDLW  1F
+001A:  MOVWF  03
+001B:  MOVLW  07
+001C:  MOVWF  1F
+001D:  BCF    03.7
+.................... { 
+....................  
+....................    while(TRUE) 
+....................    { 
+....................    /*output_high(PIN_B0); //g 
+....................    output_high(PIN_B2); //a 
+....................    output_high(PIN_B3); //b 
+....................    output_high(PIN_B5); //c 
+....................    output_high(PIN_B6); //d 
+....................    output_high(PIN_B1); //f 
+....................    output_high(PIN_B7); //e 
+....................    output_high(PIN_B4); //passa para o outro display 
+....................    */ 
+....................     
+....................        
+....................        
+....................       if(input(pin_a1)==0){ 
+001E:  BSF    03.5
+001F:  BSF    05.1
+0020:  BCF    03.5
+0021:  BTFSC  05.1
+0022:  GOTO   033
+....................          //dezena 
+....................          output_b(0b11101110);// numero 0 
+0023:  BSF    03.5
+0024:  CLRF   06
+0025:  MOVLW  EE
+0026:  BCF    03.5
+0027:  MOVWF  06
+....................          //unidade 
+....................          delay_ms(100); 
+0028:  MOVLW  64
+0029:  MOVWF  21
+002A:  CALL   004
+....................          output_b(0b01110111);// numero 5 
+002B:  BSF    03.5
+002C:  CLRF   06
+002D:  MOVLW  77
+002E:  BCF    03.5
+002F:  MOVWF  06
+....................          delay_ms(100); 
+0030:  MOVLW  64
+0031:  MOVWF  21
+0032:  CALL   004
+....................       } 
+....................       //faz o 15 
+....................       if(input(pin_a2)==0){ 
+0033:  BSF    03.5
+0034:  BSF    05.2
+0035:  BCF    03.5
+0036:  BTFSC  05.2
+0037:  GOTO   048
+....................          //dezena 
+....................          output_b(0b00101000);// numero 1 
+0038:  BSF    03.5
+0039:  CLRF   06
+003A:  MOVLW  28
+003B:  BCF    03.5
+003C:  MOVWF  06
+....................          //unidade 
+....................          delay_ms(100); 
+003D:  MOVLW  64
+003E:  MOVWF  21
+003F:  CALL   004
+....................          output_b(0b01110111);// numero 5 
+0040:  BSF    03.5
+0041:  CLRF   06
+0042:  MOVLW  77
+0043:  BCF    03.5
+0044:  MOVWF  06
+....................          delay_ms(100); 
+0045:  MOVLW  64
+0046:  MOVWF  21
+0047:  CALL   004
+....................       } 
+....................       //faz o 35 
+....................       if(input(pin_a3)==0){ 
+0048:  BSF    03.5
+0049:  BSF    05.3
+004A:  BCF    03.5
+004B:  BTFSC  05.3
+004C:  GOTO   05E
+....................          //dezena 
+....................          output_b(0b01101101);// numero 3 
+004D:  BSF    03.5
+004E:  CLRF   06
+004F:  MOVLW  6D
+0050:  BCF    03.5
+0051:  MOVWF  06
+....................          //unidade 
+....................          delay_ms(100); 
+0052:  MOVLW  64
+0053:  MOVWF  21
+0054:  CALL   004
+....................          output_b(0b01110111);// numero 5 
+0055:  BSF    03.5
+0056:  CLRF   06
+0057:  MOVLW  77
+0058:  BCF    03.5
+0059:  MOVWF  06
+....................          delay_ms(100); 
+005A:  MOVLW  64
+005B:  MOVWF  21
+005C:  CALL   004
+....................       } 
+005D:  GOTO   06E
+....................       else{ 
+....................          //liga os zeros  
+....................          output_b(0b11111110);// numero 0 
+005E:  BSF    03.5
+005F:  CLRF   06
+0060:  MOVLW  FE
+0061:  BCF    03.5
+0062:  MOVWF  06
+....................          delay_ms(10); 
+0063:  MOVLW  0A
+0064:  MOVWF  21
+0065:  CALL   004
+....................          output_b(0b11101110);// numero 0 
+0066:  BSF    03.5
+0067:  CLRF   06
+0068:  MOVLW  EE
+0069:  BCF    03.5
+006A:  MOVWF  06
+....................          delay_ms(10); 
+006B:  MOVLW  0A
+006C:  MOVWF  21
+006D:  CALL   004
+....................       } 
+006E:  GOTO   01E
+....................     
+....................     
+....................    } 
+....................  
+.................... } 
+006F:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F22   NOWDT PUT HS MCLR NOBROWNOUT NOLVP NOCPD NOPROTECT

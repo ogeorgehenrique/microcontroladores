@@ -1,0 +1,64 @@
+#include <16F877A.h>
+#use delay(clock=20000000)
+
+
+#define BOTAO         PIN_A0
+#define PED_VERDE     PIN_C2
+#define PED_VERMELHO  PIN_B1
+
+#define CAR_VERMELHO  PIN_B2
+#define CAR_AMARELO   PIN_B3
+#define CAR_VERDE     PIN_B4
+
+#define DIG1 PIN_C0
+#define DIG2 PIN_C1
+
+const int segmentos[10] = {
+   0b00111111, 0b00000110, 0b01011011, 0b01001111, 0b01100110,
+   0b01101101, 0b01111101, 0b00000111, 0b01111111, 0b01101111
+};
+
+void mostrar_display(int num) {
+   int d = num / 10;
+   int u = num % 10;
+   output_high(DIG1); output_low(DIG2); output_d(segmentos[d]); delay_ms(5);
+   output_low(DIG1); output_high(DIG2); output_d(segmentos[u]); delay_ms(5);
+}
+
+void estado_inicial() {
+   output_high(CAR_VERDE);
+   output_low(CAR_AMARELO);
+   output_low(CAR_VERMELHO);
+   output_high(PED_VERMELHO);
+   output_low(PED_VERDE);
+
+}
+
+void semaforo_pedestre() {
+   output_high(CAR_VERDE);
+   output_high(PED_VERMELHO);
+
+   for (int i = 15; i >= 0; i--) {
+      for (int j = 0; j < 16; j++) mostrar_display(i);
+   }
+}
+
+void main() {
+   while(TRUE) {
+      estado_inicial();
+      while (input(BOTAO) == 1) {
+         mostrar_display(15);
+      }
+      delay_ms(100);
+      while (input(BOTAO) == 0);
+      semaforo_pedestre();
+      output_high(CAR_AMARELO);
+      delay_ms(1000);
+      output_low(CAR_AMARELO);
+      output_high(CAR_VERMELHO);
+      output_high(PED_VERDE);
+      delay_ms(5000);
+      output_high(PED_VERDE);
+   }
+ 
+}

@@ -1,0 +1,20 @@
+[PROJECT]
+Target=C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Teclado\teclado.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+[Target Data]
+FileList=teclado.c
+[Directories]
+Include=
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Teclado\teclado]
+Type=4
+[mru-list]
+1=teclado.c
+[Units]
+Count=1
+1=teclado (main)
+[Opened Files]
+1=teclado.c
+2=kbd_ext_board2.c
+3=

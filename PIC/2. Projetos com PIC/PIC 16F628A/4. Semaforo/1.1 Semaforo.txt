@@ -1,0 +1,11 @@
+Feito para rodar no PicSimLab com o PIC 16f628a na Boad: McLab 01
+
+
+*este código faz:
+- O programa liga e não faz nada, apenas espera. Os displays ficam apagados.
+- O usuário aperta o botão em pin_a1 (Botão B2).
+- O LED em pin_a0 (LED L1) dá uma piscada rápida (100ms).
+- Imediatamente, os displays de 7 segmentos acendem e mostram "20".
+- A cada 0.2 segundos, o número diminui: "19", "18", "17", ..., "01", "00".
+- Após mostrar "00", os displays se apagam.
+- O programa volta para o passo 1, esperando que o usuário aperte o botão novamente para iniciar uma nova contagem.

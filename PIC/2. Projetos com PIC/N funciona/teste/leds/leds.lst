@@ -1,0 +1,278 @@
+CCS PCM C Compiler, Version 5.015, 5967               21-nov-25 11:21
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\teste\leds\leds.lst
+
+               ROM used:   161 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   5 (1%) at main() level
+                           18 (5%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   01A
+0003:  NOP
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+....................  
+.................... // --- Configurações dos Fuses (Padrão PICGenios) --- 
+.................... #FUSES NOWDT, HS, NOPUT, NOPROTECT, NODEBUG, NOBROWNOUT, NOLVP, NOCPD, NOWRT 
+.................... #use delay(clock=20000000) // Cristal de 20MHz 
+0004:  MOVLW  2D
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  BCF    0A.3
+0018:  BCF    0A.4
+0019:  GOTO   039 (RETURN)
+....................  
+.................... // --- Definição dos LEDs no PORTD (Padrão PICGenios) --- 
+.................... #define LED1 PIN_D0 
+.................... #define LED2 PIN_D1 
+.................... #define LED3 PIN_D2 
+.................... #define LED4 PIN_D3 
+.................... #define LED5 PIN_D4 
+.................... #define LED6 PIN_D5 
+....................  
+.................... // --- Definição dos Tempos de Troca (Calculados acima) --- 
+.................... #define TEMPO_LED1 250 // 2 Hz 
+.................... #define TEMPO_LED2 166 // 3 Hz 
+.................... #define TEMPO_LED3 100 // 5 Hz 
+.................... #define TEMPO_LED4 62  // 8 Hz 
+.................... #define TEMPO_LED5 38  // 13 Hz 
+.................... #define TEMPO_LED6 23  // 21 Hz 
+....................  
+.................... void main() { 
+001A:  MOVF   03,W
+001B:  ANDLW  1F
+001C:  MOVWF  03
+001D:  BSF    03.5
+001E:  BSF    1F.0
+001F:  BSF    1F.1
+0020:  BSF    1F.2
+0021:  BCF    1F.3
+0022:  MOVLW  07
+0023:  MOVWF  1C
+0024:  BCF    03.7
+....................     // Configura o PORTD como saída (onde estão os LEDs) 
+....................     set_tris_d(0x00); 
+0025:  MOVLW  00
+0026:  MOVWF  08
+....................     output_d(0x00); // Começa com tudo apagado 
+0027:  CLRF   08
+0028:  BCF    03.5
+0029:  CLRF   08
+....................  
+....................     // --- Variáveis Contadoras --- 
+....................     // Elas vão contar quantos milissegundos se passaram para cada LED 
+....................     unsigned int16 cont1 = 0; 
+....................     unsigned int16 cont2 = 0; 
+....................     unsigned int16 cont3 = 0; 
+....................     unsigned int16 cont4 = 0; 
+....................     unsigned int16 cont5 = 0; 
+....................     unsigned int16 cont6 = 0; 
+002A:  CLRF   22
+002B:  CLRF   21
+002C:  CLRF   24
+002D:  CLRF   23
+002E:  CLRF   26
+002F:  CLRF   25
+0030:  CLRF   28
+0031:  CLRF   27
+0032:  CLRF   2A
+0033:  CLRF   29
+0034:  CLRF   2C
+0035:  CLRF   2B
+....................  
+....................     while(true) { 
+....................          
+....................         // --- BASE DE TEMPO (O Coração do Código) --- 
+....................         // Atrasamos apenas 1ms por ciclo. Isso é rápido o suficiente 
+....................         // para parecer que tudo está acontecendo ao mesmo tempo. 
+....................         delay_ms(1); 
+0036:  MOVLW  01
+0037:  MOVWF  2D
+0038:  GOTO   004
+....................  
+....................         // Incrementa todos os contadores 
+....................         cont1++; 
+0039:  INCF   21,F
+003A:  BTFSC  03.2
+003B:  INCF   22,F
+....................         cont2++; 
+003C:  INCF   23,F
+003D:  BTFSC  03.2
+003E:  INCF   24,F
+....................         cont3++; 
+003F:  INCF   25,F
+0040:  BTFSC  03.2
+0041:  INCF   26,F
+....................         cont4++; 
+0042:  INCF   27,F
+0043:  BTFSC  03.2
+0044:  INCF   28,F
+....................         cont5++; 
+0045:  INCF   29,F
+0046:  BTFSC  03.2
+0047:  INCF   2A,F
+....................         cont6++; 
+0048:  INCF   2B,F
+0049:  BTFSC  03.2
+004A:  INCF   2C,F
+....................  
+....................         // --- Lógica do LED 1 (2 Hz) --- 
+....................         if (cont1 >= TEMPO_LED1) { 
+004B:  MOVF   22,F
+004C:  BTFSS  03.2
+004D:  GOTO   052
+004E:  MOVF   21,W
+004F:  SUBLW  F9
+0050:  BTFSC  03.0
+0051:  GOTO   059
+....................             output_toggle(LED1); // Inverte o estado do LED 
+0052:  BSF    03.5
+0053:  BCF    08.0
+0054:  MOVLW  01
+0055:  BCF    03.5
+0056:  XORWF  08,F
+....................             cont1 = 0;           // Reinicia o contador dele 
+0057:  CLRF   22
+0058:  CLRF   21
+....................         } 
+....................  
+....................         // --- Lógica do LED 2 (3 Hz) --- 
+....................         if (cont2 >= TEMPO_LED2) { 
+0059:  MOVF   24,F
+005A:  BTFSS  03.2
+005B:  GOTO   060
+005C:  MOVF   23,W
+005D:  SUBLW  A5
+005E:  BTFSC  03.0
+005F:  GOTO   067
+....................             output_toggle(LED2); 
+0060:  BSF    03.5
+0061:  BCF    08.1
+0062:  MOVLW  02
+0063:  BCF    03.5
+0064:  XORWF  08,F
+....................             cont2 = 0; 
+0065:  CLRF   24
+0066:  CLRF   23
+....................         } 
+....................  
+....................         // --- Lógica do LED 3 (5 Hz) --- 
+....................         if (cont3 >= TEMPO_LED3) { 
+0067:  MOVF   26,F
+0068:  BTFSS  03.2
+0069:  GOTO   06E
+006A:  MOVF   25,W
+006B:  SUBLW  63
+006C:  BTFSC  03.0
+006D:  GOTO   075
+....................             output_toggle(LED3); 
+006E:  BSF    03.5
+006F:  BCF    08.2
+0070:  MOVLW  04
+0071:  BCF    03.5
+0072:  XORWF  08,F
+....................             cont3 = 0; 
+0073:  CLRF   26
+0074:  CLRF   25
+....................         } 
+....................  
+....................         // --- Lógica do LED 4 (8 Hz) --- 
+....................         if (cont4 >= TEMPO_LED4) { 
+0075:  MOVF   28,F
+0076:  BTFSS  03.2
+0077:  GOTO   07C
+0078:  MOVF   27,W
+0079:  SUBLW  3D
+007A:  BTFSC  03.0
+007B:  GOTO   083
+....................             output_toggle(LED4); 
+007C:  BSF    03.5
+007D:  BCF    08.3
+007E:  MOVLW  08
+007F:  BCF    03.5
+0080:  XORWF  08,F
+....................             cont4 = 0; 
+0081:  CLRF   28
+0082:  CLRF   27
+....................         } 
+....................  
+....................         // --- Lógica do LED 5 (13 Hz) --- 
+....................         if (cont5 >= TEMPO_LED5) { 
+0083:  MOVF   2A,F
+0084:  BTFSS  03.2
+0085:  GOTO   08A
+0086:  MOVF   29,W
+0087:  SUBLW  25
+0088:  BTFSC  03.0
+0089:  GOTO   091
+....................             output_toggle(LED5); 
+008A:  BSF    03.5
+008B:  BCF    08.4
+008C:  MOVLW  10
+008D:  BCF    03.5
+008E:  XORWF  08,F
+....................             cont5 = 0; 
+008F:  CLRF   2A
+0090:  CLRF   29
+....................         } 
+....................  
+....................         // --- Lógica do LED 6 (21 Hz) --- 
+....................         if (cont6 >= TEMPO_LED6) { 
+0091:  MOVF   2C,F
+0092:  BTFSS  03.2
+0093:  GOTO   098
+0094:  MOVF   2B,W
+0095:  SUBLW  16
+0096:  BTFSC  03.0
+0097:  GOTO   09F
+....................             output_toggle(LED6); 
+0098:  BSF    03.5
+0099:  BCF    08.5
+009A:  MOVLW  20
+009B:  BCF    03.5
+009C:  XORWF  08,F
+....................             cont6 = 0; 
+009D:  CLRF   2C
+009E:  CLRF   2B
+....................         } 
+009F:  GOTO   036
+....................     } 
+.................... } 
+00A0:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

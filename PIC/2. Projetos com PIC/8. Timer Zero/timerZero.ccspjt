@@ -1,0 +1,22 @@
+[PROJECT]
+Target=timerZero.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=timerZero.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Timer Zero\timerZero]
+Type=4
+[mru-list]
+1=timerZero.c
+[Opened Files]
+1=timerZero.c
+2=
+[timerZero.c]
+Type=4
+[Units]
+Count=1
+1=timerZero (main)

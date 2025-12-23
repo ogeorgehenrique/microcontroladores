@@ -1,0 +1,298 @@
+CCS PCM C Compiler, Version 5.015, 5967               17-nov-25 10:32
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Timer Zero\timerZero.lst
+
+               ROM used:   135 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   14 (4%) at main() level
+                           14 (4%) worst case
+               Stack used: 1 locations (0 in main + 1 for interrupts)
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   03A
+0003:  NOP
+0004:  MOVWF  7F
+0005:  SWAPF  03,W
+0006:  CLRF   03
+0007:  MOVWF  21
+0008:  MOVF   0A,W
+0009:  MOVWF  20
+000A:  CLRF   0A
+000B:  MOVF   04,W
+000C:  MOVWF  22
+000D:  MOVF   77,W
+000E:  MOVWF  23
+000F:  MOVF   78,W
+0010:  MOVWF  24
+0011:  MOVF   79,W
+0012:  MOVWF  25
+0013:  MOVF   7A,W
+0014:  MOVWF  26
+0015:  BCF    03.7
+0016:  BCF    03.5
+0017:  BTFSS  0B.5
+0018:  GOTO   01B
+0019:  BTFSC  0B.2
+001A:  GOTO   02C
+001B:  MOVF   22,W
+001C:  MOVWF  04
+001D:  MOVF   23,W
+001E:  MOVWF  77
+001F:  MOVF   24,W
+0020:  MOVWF  78
+0021:  MOVF   25,W
+0022:  MOVWF  79
+0023:  MOVF   26,W
+0024:  MOVWF  7A
+0025:  MOVF   20,W
+0026:  MOVWF  0A
+0027:  SWAPF  21,W
+0028:  MOVWF  03
+0029:  SWAPF  7F,F
+002A:  SWAPF  7F,W
+002B:  RETFIE
+002C:  BCF    0A.3
+002D:  BCF    0A.4
+002E:  GOTO   02F
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Demonstração de Interrupção com Timer 0 (RTCC) 
+....................  * PLACA ALVO: PICGenios 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este programa demonstra como usar as interrupções do Timer 0 (RTCC). 
+....................  * O programa principal (main) não faz nada; ele apenas configura o timer 
+....................  * e entra em um loop vazio. 
+....................  * 
+....................  * O Timer 0 é configurado para "estourar" (overflow) a cada 13.1ms. 
+....................  * A cada estouro, ele gera uma INTERRUPÇÃO, que pausa o loop 'main' 
+....................  * momentaneamente e executa a função 'RTCC_isr'. 
+....................  * 
+....................  * FUNCIONAMENTO ATUAL: 
+....................  * A função 'RTCC_isr' simplesmente inverte o estado do pino RC2 
+....................  * (LED RL1 na PICGenios) a cada 13.1ms. Isso cria um pisca-pisca 
+....................  * de alta frequência (~38 Hz), fazendo o LED parecer aceso 
+....................  * com metade do brilho (efeito "dimmer"). 
+....................  * 
+....................  * FUNCIONAMENTO COMENTADO: 
+....................  * O código comentado dentro da ISR implementa um contador para 
+....................  * criar um pisca-pisca de 1 segundo no pino RD0 (LED RL4). 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device adc=8        // Define o ADC para 8 bits (não usado neste código) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES HS         // Oscilador High Speed (para o cristal de 20MHz) 
+.................... #FUSES NOPUT      // Desabilita o Power Up Timer 
+.................... #FUSES NOPROTECT  // Código não protegido contra leitura 
+.................... #FUSES NODEBUG    // Modo Debug desligado 
+.................... #FUSES NOBROWNOUT // Desabilita reset por queda de tensão 
+.................... #FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3) 
+.................... #FUSES NOCPD      // Proteção de dados da EEPROM desligada 
+.................... #FUSES NOWRT      // Memória de programa não protegida contra escrita 
+.................... #FUSES RESERVED   // Bits de fuse reservados 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz 
+.................... #use delay(clock=20000000) 
+....................  
+.................... // --- Variável Global --- 
+.................... // Esta variável seria usada pela lógica comentada para contar 
+.................... // o número de interrupções. 
+.................... unsigned int8 contador=0; 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO DE INTERRUPÇÃO (ISR) DO TIMER 0 (RTCC) 
+....................  * ============================================================================== 
+....................  * Esta diretiva '#int_RTCC' informa ao compilador: 
+....................  * "O código a seguir deve ser executado QUANDO o Timer 0 estourar". 
+....................  */ 
+.................... #int_RTCC 
+.................... void RTCC_isr(void) 
+.................... { 
+....................     // --- Código Ativo --- 
+....................     // Inverte o estado do pino RC2 (LED RL1 na PICGenios). 
+....................     // Como a interrupção ocorre a cada 13.1ms, o LED pisca 
+....................     // a uma frequência de ~38Hz (1 / (2 * 13.1ms)). 
+....................     // O olho humano não vê a piscada, apenas o LED com brilho reduzido. 
+....................     output_toggle(PIN_C2); 
+002F:  BCF    28.2
+0030:  MOVF   28,W
+0031:  BSF    03.5
+0032:  MOVWF  07
+0033:  MOVLW  04
+0034:  BCF    03.5
+0035:  XORWF  07,F
+....................  
+....................     /* 
+....................     // --- Código Comentado (Intenção Original) --- 
+....................     // Esta era a lógica provável para criar um pisca-pisca de 1 segundo. 
+....................  
+....................     // 1. Incrementa o contador a cada interrupção (a cada 13.1ms) 
+....................     contador = contador + 1; 
+....................      
+....................     // 2. Verifica se o contador atingiu 76 
+....................     // Cálculo: 76 * 13.1ms = 995.6ms (aproximadamente 1 segundo) 
+....................     if(contador >= 76) 
+....................     { 
+....................         // 3. Pisca o LED no pino RD0 (LED RL4 na PICGenios) 
+....................         output_toggle(PIN_D0); 
+....................          
+....................         // 4. Zera o contador para começar a contar o próximo segundo 
+....................         contador = 0; 
+....................     } 
+....................     */ 
+0036:  BCF    0B.2
+0037:  BCF    0A.3
+0038:  BCF    0A.4
+0039:  GOTO   01B
+.................... } // Fim da rotina de interrupção 
+....................  
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL (main) 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+003A:  MOVF   03,W
+003B:  ANDLW  1F
+003C:  MOVWF  03
+003D:  CLRF   27
+003E:  MOVLW  FF
+003F:  MOVWF  28
+0040:  BSF    03.5
+0041:  BSF    1F.0
+0042:  BSF    1F.1
+0043:  BSF    1F.2
+0044:  BCF    1F.3
+0045:  MOVLW  07
+0046:  MOVWF  1C
+0047:  BCF    03.7
+.................... { 
+....................     // --- Configuração dos Periféricos --- 
+....................     // Desliga todos os periféricos que não serão usados 
+....................     setup_adc_ports(NO_ANALOGS); // Todos os pinos como digitais 
+0048:  BSF    1F.0
+0049:  BSF    1F.1
+004A:  BSF    1F.2
+004B:  BCF    1F.3
+....................     setup_adc(ADC_OFF);          // Desliga o módulo ADC 
+004C:  BCF    03.5
+004D:  BCF    1F.0
+....................     setup_psp(PSP_DISABLED); 
+004E:  BSF    03.5
+004F:  BCF    09.4
+....................     setup_spi(SPI_SS_DISABLED); 
+0050:  BCF    03.5
+0051:  BCF    14.5
+0052:  BCF    28.5
+0053:  MOVF   28,W
+0054:  BSF    03.5
+0055:  MOVWF  07
+0056:  BCF    03.5
+0057:  BSF    28.4
+0058:  MOVF   28,W
+0059:  BSF    03.5
+005A:  MOVWF  07
+005B:  BCF    03.5
+005C:  BCF    28.3
+005D:  MOVF   28,W
+005E:  BSF    03.5
+005F:  MOVWF  07
+0060:  MOVLW  01
+0061:  BCF    03.5
+0062:  MOVWF  14
+0063:  MOVLW  00
+0064:  BSF    03.5
+0065:  MOVWF  14
+....................  
+....................     // --- Configuração do Timer 0 (RTCC) --- 
+....................     // Esta é a linha mais importante do setup. 
+....................     // RTCC_INTERNAL: Usa o clock interno do PIC (Fosc/4) 
+....................     // RTCC_DIV_256:  Usa o "prescaler" (divisor de frequência) máximo, 256. 
+....................     // Isso torna o timer 256x mais lento. 
+....................     // O resultado é um "estouro" (overflow) a cada 13.1 milissegundos. 
+....................     setup_timer_0(RTCC_INTERNAL|RTCC_DIV_256); // Overflow 13,1 ms 
+0066:  MOVF   01,W
+0067:  ANDLW  C0
+0068:  IORLW  07
+0069:  MOVWF  01
+....................  
+....................     // Desliga os outros timers 
+....................     setup_timer_1(T1_INTERNAL|T1_DIV_BY_1); 
+006A:  MOVLW  85
+006B:  BCF    03.5
+006C:  MOVWF  10
+....................     setup_timer_2(T2_DISABLED,0,1); 
+006D:  MOVLW  00
+006E:  MOVWF  78
+006F:  MOVWF  12
+0070:  MOVLW  00
+0071:  BSF    03.5
+0072:  MOVWF  12
+....................      
+....................     setup_comparator(NC_NC_NC_NC); 
+0073:  MOVLW  07
+0074:  MOVWF  1C
+0075:  MOVF   05,W
+0076:  MOVWF  05
+0077:  MOVLW  10
+0078:  MOVWF  77
+0079:  DECFSZ 77,F
+007A:  GOTO   079
+007B:  NOP
+007C:  MOVF   1C,W
+007D:  BCF    03.5
+007E:  BCF    0D.6
+....................     setup_vref(FALSE); 
+007F:  BSF    03.5
+0080:  CLRF   1D
+....................  
+....................     // --- Habilitação das Interrupções --- 
+....................     // Liga a "chave" específica para a interrupção do Timer 0 (RTCC) 
+....................     enable_interrupts(INT_RTCC); 
+0081:  BCF    03.5
+0082:  BSF    0B.5
+....................     // Liga a "chave geral" que permite que QUALQUER interrupção aconteça 
+....................     enable_interrupts(GLOBAL); 
+0083:  MOVLW  C0
+0084:  IORWF  0B,F
+....................  
+....................     // --- Loop Infinito Vazio --- 
+....................     // O programa principal fica "preso" aqui e não faz nada. 
+....................     // A CPU fica ociosa, esperando. 
+....................     // Todo o "trabalho" (piscar o LED) é feito em "segundo plano" 
+....................     // pela rotina de interrupção 'RTCC_isr', que é chamada 
+....................     // automaticamente pelo hardware do Timer 0. 
+....................     while(true) 
+....................     { 
+0085:  GOTO   085
+....................         // Aguardando interrupções... 
+....................     } 
+.................... } 
+0086:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

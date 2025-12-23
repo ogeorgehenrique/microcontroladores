@@ -1,0 +1,24 @@
+[PROJECT]
+Target=lcd ola mundo.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=lcd ola mundo.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PARA PIC\LCD ola mundo\lcd ola mundo]
+Type=4
+[mru-list]
+1=lcd ola mundo.c
+[Opened Files]
+1=lcd ola mundo.c
+2=
+3=..\..\..\..\..\AppData\Local\Temp\8b62ae18-0410-4469-bc51-4a447672c867_Fábio Pereira.zip.Fábio Pereira.zip\Fábio Pereira\mod_lcd.c
+4=
+[lcd ola mundo.c]
+Type=4
+[Units]
+Count=1
+1=lcd ola mundo (main)

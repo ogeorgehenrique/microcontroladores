@@ -1,0 +1,149 @@
+/*
+ * ==============================================================================
+ * PROJETO: Efeito de "Fade" ou "Respiração" (Breathing) com Coller
+ * PLACA ALVO: PICGenios
+ * MICROCONTROLADOR: PIC16F877A
+ *
+ * DESCRIÇÃO:
+ * Este código cria um efeito de "fade" (aumento e diminuição suave
+ * de velocidade do coller/ventoinha) na PICGenios.
+ * a velocidade é controlado por PWM (Modulação por Largura de Pulso)
+ * implementado via SOFTWARE, usando delays manuais.
+ *
+ * 1. (Fade In): O brilho aumenta de 0% para 100% em 5 segundos.
+ * 2. (Fade Out): O brilho diminui de 100% para 0% em 5 segundos.
+ * 3. O ciclo se repete.
+ *
+ * ==============================================================================
+ */
+
+#include <16F877A.h> // Biblioteca padrão do PIC16F877A
+#device adc=10       // Define a resolução do ADC para 10 bits (não usado aqui)
+
+// --- Configuração dos Fuses ---
+#FUSES NOWDT      // Desabilita o Watch Dog Timer
+#FUSES HS         // Oscilador High Speed (para o cristal de 20MHz)
+#FUSES NOPUT      // Desabilita o Power Up Timer
+#FUSES NOPROTECT  // Código não protegido contra leitura
+#FUSES NODEBUG    // Modo Debug desligado
+#FUSES BROWNOUT   // ATIVA o reset por queda de tensão (Brownout)
+#FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3)
+#FUSES NOCPD      // Proteção de dados da EEPROM desligada
+#FUSES NOWRT      // Memória de programa não protegida contra escrita
+#FUSES RESERVED   // Bits de fuse reservados
+
+// Informa ao compilador que o cristal é de 20MHz
+#use delay(clock=20000000)
+
+/*
+ * ==============================================================================
+ * FUNÇÃO PRINCIPAL
+ * ==============================================================================
+ */
+void main()
+{
+    // --- Declaração de Variáveis ---
+    unsigned int16 ton=0, toff=0; // 'ton' = Tempo Ligado (em microssegundos)
+                                 // 'toff' = Tempo Desligado (em microssegundos)
+    unsigned int8 cont = 0;      // Variável de controle para o loop interno (velocidade)
+
+    // ==========================================================================
+    // --- CONFIGURAÇÃO DOS PERIFÉRICOS (A MAIORIA NÃO É USADA) ---
+    // Este bloco é "código morto", provavelmente copiado de outro projeto.
+    // O programa não chama 'read_adc()' no loop principal.
+    
+    // configuração do AD
+    setup_adc_ports(AN0_AN1_AN3); // Configura pinos analógicos
+    setup_adc(ADC_CLOCK_DIV_16);  // Configura velocidade do AD
+    setup_psp(PSP_DISABLED);      // Desabilita porta paralela
+    setup_spi(SPI_SS_DISABLED);   // Desabilita SPI
+    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1); // Configura Timer 0
+    setup_timer_1(T1_DISABLED);   // Desabilita Timer 1
+    
+    // Desabilita o Timer 2. Isso confirma que o PWM por HARDWARE
+    // (que depende do Timer 2) não está sendo usado.
+    setup_timer_2(T2_DISABLED,0,1); 
+    
+    setup_comparator(NC_NC_NC_NC); // Desliga comparadores
+    setup_vref(FALSE);             // Desliga referência de tensão
+    
+    // Define o canal do AD como 0, mas nunca lê o valor.
+    set_adc_channel(0);
+    delay_us(50);
+    // --- FIM DO BLOCO DE CONFIGURAÇÃO NÃO UTILIZADO ---
+    // ==========================================================================
+
+
+    // --- Loop Infinito Principal ---
+    while(true)
+    {
+        /*
+         * =================================================================
+         * LOOP 1: FADE IN (Aumentando o brilho) - Duração: 5 segundos
+         * =================================================================
+         * O loop externo 'for' controla o brilho ('ton'),
+         * variando de 1 (brilho 0,1%) até 1000 (brilho 100%).
+         */
+        for(ton=1; ton<=1000; ton++)
+        {
+            /*
+             * O loop interno 'for' (cont) controla a VELOCIDADE do fade.
+             * Ele repete o mesmo nível de brilho 5 vezes.
+             * Cada ciclo dura 1ms (ton + toff).
+             * Tempo por passo de brilho = 5 * 1ms = 5ms
+             * Tempo total do Fade In = 1000 passos * 5ms/passo = 5000ms = 5 segundos.
+             */
+            for(cont=1; cont<=5; cont++)
+            {
+                // --- Bloco de PWM por Software (Período total = 1000us) ---
+                
+                // 1. Liga o LED (no pino RC2)
+                output_high(PIN_C2);
+                // 2. Mantém o LED ligado pelo tempo 'ton'
+                delay_us(ton); 
+                
+                // 3. Calcula o tempo que o LED deve ficar desligado
+                //    para completar o período de 1000us (1ms).
+                toff = 1000 - ton;
+                
+                // 4. Desliga o LED
+                output_low(PIN_C2);
+                // 5. Mantém o LED desligado pelo tempo 'toff'
+                delay_us(toff); 
+            }
+        } // Fim do Fade In (Brilho está em 100%)
+
+        /*
+         * =================================================================
+         * LOOP 2: FADE OUT (Diminuindo o brilho) - Duração: 5 segundos
+         * =================================================================
+         * O loop externo 'for' agora faz o oposto:
+         * varia o brilho ('ton') de 1000 (100%) de volta para 1 (0,1%).
+         */
+        for(ton=1000; ton>0; ton--)
+        {
+            /*
+             * O loop interno de velocidade é idêntico.
+             * Tempo total do Fade Out = 1000 passos * 5ms/passo = 5000ms = 5 segundos.
+             */
+            for(cont=1; cont<=5; cont++)
+            {
+                // --- Bloco de PWM por Software (Período total = 1000us) ---
+                
+                // 1. Liga o LED
+                output_high(PIN_C2);
+                // 2. Mantém ligado por 'ton' (que agora está diminuindo)
+                delay_us(ton);
+                
+                // 3. Calcula o tempo desligado
+                toff = 1000 - ton;
+                
+                // 4. Desliga o LED
+                output_low(PIN_C2);
+                // 5. Mantém desligado por 'toff'
+                delay_us(toff); 
+            }
+        } // Fim do Fade Out (Brilho está em 0%)
+        
+    } // Fim do while(true), o ciclo todo recomeça
+}

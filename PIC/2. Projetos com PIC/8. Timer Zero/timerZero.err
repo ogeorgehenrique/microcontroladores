@@ -1,0 +1,4 @@
+>>> Warning 202 "timerZero.c" Line 49(15,23): Variable never used:   contador
+      Memory usage:   ROM=2%      RAM=4% - 4%
+      0 Errors,  1 Warnings.
+Build Successful.

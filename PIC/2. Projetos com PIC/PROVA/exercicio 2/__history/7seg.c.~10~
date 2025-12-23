@@ -1,0 +1,18 @@
+#include <7seg.h>
+
+void main()
+{
+
+   while(TRUE)
+   {
+   output_high(PIN_B0); //g
+   output_high(PIN_B2); //a
+   output_high(PIN_B3); //b
+   output_high(PIN_B5);//c
+   output_high(PIN_B6); //d
+   output_high(PIN_B1); //f
+   output_high(PIN_B7); //
+   output_high(PIN_B4); //passa para o outro display
+   }
+
+}

@@ -1,0 +1,51 @@
+#include <lm35.h>
+
+
+#ifndef lcd_enable
+#define lcd_enable pin_E1 // pino enable (E) do LCD -> conectado ao RE1
+#define lcd_rs pin_E2     // pino rs (Register Select) do LCD -> conectado ao RE2
+//#define lcd_rw pin_A4   // pino rw (Read/Write) do LCD (comentado, prov. aterrado na placa)
+#define lcd_d4 pin_d4     // pino de dados d4 do LCD -> conectado ao RD4
+#define lcd_d5 pin_d5     // pino de dados d5 do LCD -> conectado ao RD5
+#define lcd_d6 pin_d6     // pino de dados d6 do LCD -> conectado ao RD6
+#define lcd_d7 pin_d7     // pino de dados d7 do LCD -> conectado ao RD7
+#endif
+
+#include "mod_lcd.c"
+
+
+void main()
+{
+   setup_adc_ports(AN0);
+   setup_adc(ADC_CLOCK_DIV_2);
+   unsigned int16 valor1=0, valor2=0;
+   
+   
+    lcd_ini();     // Inicializa o display (função que está no 'mod_lcd.c')
+    delay_ms(50);  // Pequena pausa para o LCD estabilizar
+    
+    // --- Tela de Boas-Vindas ---
+    lcd_escreve ('\f'); // Envia o comando "Limpar Tela" (Form Feed)
+    printf (lcd_escreve," IFMT 2025 \r\n"); // Escreve " IFMT 2025 " na linha 1
+    printf (lcd_escreve," LCD e AD ");      // Escreve " LCD e AD " na linha 2
+    delay_ms (2000); // Mostra a mensagem por 2 segundos
+   
+   
+   while(TRUE)
+   {
+      // --- Leitura do Canal 1 (Temperatura) ---
+        set_adc_channel(0);  // 1. Seleciona o Canal 0 (AN0 / RA0)
+        delay_us(50);        // 2. Espera 50 microssegundos para o canal estabilizar
+        valor1 = read_adc(A0); // 3. Faz a leitura e armazena em 'valor1'
+        delay_us(50);
+        delay_ms(150);       // Pausa (para não sobrecarregar)
+        
+        // 4. Mostra o valor1 no LCD
+        // \f = Limpa a tela
+        // %Lu = Formato para 'long unsigned int' (int16)
+        // \n\r = Pula para a próxima linha
+        printf(lcd_escreve,"\fvalue1 = %Lu\n\r", valor1);
+        delay_us(50);
+   }
+
+}

@@ -1,0 +1,375 @@
+CCS PCM C Compiler, Version 5.015, 5967               15-nov-25 16:32
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\display7seg_2\display7seg_2.lst
+
+               ROM used:   186 words (9%)
+                           Largest free fragment is 1862
+               RAM used:   10 (4%) at main() level
+                           12 (5%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   070
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Contador Ping-Pong (25 a 60) 
+....................  * PLACA ALVO: McLab 1 (PICSIMLab) 
+....................  * MICROCONTROLADOR: PIC16F628A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este código implementa um contador que é exibido nos dois displays 
+....................  * de 7 segmentos da placa McLab 1. 
+....................  * O contador começa em 25, sobe até 60, depois desce até 25, 
+....................  * e repete esse ciclo "ping-pong" indefinidamente. 
+....................  * A mudança de número ocorre a cada 1 segundo. 
+....................  * 
+....................  * ATENÇÃO: Este código foi feito especificamente para a McLab 1. 
+....................  * Ele NÃO funcionará na McLab 2, pois ela usa um PIC diferente (16F877A) 
+....................  * e tem um hardware (pinagem) diferente. 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... // --- Inclusão de Bibliotecas --- 
+.................... #include <16F628A.h> // Importa o "manual" do PIC16F628A, informando ao compilador 
+.................... //////////// Standard Header file for the PIC16F628A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F628A 
+0004:  BCF    0A.0
+0005:  BCF    0A.1
+0006:  BCF    0A.2
+0007:  ADDWF  02,F
+0008:  RETLW  FE
+0009:  RETLW  38
+000A:  RETLW  DD
+000B:  RETLW  7D
+000C:  RETLW  3B
+000D:  RETLW  77
+000E:  RETLW  F7
+000F:  RETLW  3C
+0010:  RETLW  FF
+0011:  RETLW  7F
+0012:  RETLW  00
+0013:  BCF    0A.0
+0014:  BCF    0A.1
+0015:  BCF    0A.2
+0016:  ADDWF  02,F
+0017:  RETLW  EE
+0018:  RETLW  28
+0019:  RETLW  CD
+001A:  RETLW  6D
+001B:  RETLW  2B
+001C:  RETLW  67
+001D:  RETLW  E7
+001E:  RETLW  2C
+001F:  RETLW  EF
+0020:  RETLW  6F
+0021:  RETLW  00
+0022:  MOVF   25,W
+0023:  CLRF   78
+0024:  SUBWF  24,W
+0025:  BTFSC  03.0
+0026:  GOTO   02A
+0027:  MOVF   24,W
+0028:  MOVWF  77
+0029:  GOTO   036
+002A:  CLRF   77
+002B:  MOVLW  08
+002C:  MOVWF  26
+002D:  RLF    24,F
+002E:  RLF    77,F
+002F:  MOVF   25,W
+0030:  SUBWF  77,W
+0031:  BTFSC  03.0
+0032:  MOVWF  77
+0033:  RLF    78,F
+0034:  DECFSZ 26,F
+0035:  GOTO   02D
+0036:  RETURN
+*
+004B:  CLRF   77
+004C:  CLRF   78
+004D:  MOVF   24,W
+004E:  BCF    03.0
+004F:  BTFSC  25.0
+0050:  ADDWF  77,F
+0051:  RRF    77,F
+0052:  RRF    78,F
+0053:  BTFSC  25.1
+0054:  ADDWF  77,F
+0055:  RRF    77,F
+0056:  RRF    78,F
+0057:  BTFSC  25.2
+0058:  ADDWF  77,F
+0059:  RRF    77,F
+005A:  RRF    78,F
+005B:  BTFSC  25.3
+005C:  ADDWF  77,F
+005D:  RRF    77,F
+005E:  RRF    78,F
+005F:  BTFSC  25.4
+0060:  ADDWF  77,F
+0061:  RRF    77,F
+0062:  RRF    78,F
+0063:  BTFSC  25.5
+0064:  ADDWF  77,F
+0065:  RRF    77,F
+0066:  RRF    78,F
+0067:  BTFSC  25.6
+0068:  ADDWF  77,F
+0069:  RRF    77,F
+006A:  RRF    78,F
+006B:  BTFSC  25.7
+006C:  ADDWF  77,F
+006D:  RRF    77,F
+006E:  RRF    78,F
+006F:  GOTO   0B6 (RETURN)
+....................  
+.................... #list 
+....................  
+....................                      // quais são os pinos, registradores, etc. 
+....................  
+.................... // --- Configurações do Microcontrolador (FUSES) --- 
+.................... // Fuses são "configurações de hardware" gravadas no chip. 
+.................... #FUSES NOWDT         // Desabilita o "Watch Dog Timer" (Cão de Guarda). 
+....................                      // (Se o PIC travasse, o WDT o reiniciaria. Não precisamos disso aqui.) 
+.................... #FUSES NOBROWNOUT   // Desabilita o "Brownout Reset". 
+....................                      // (Que reiniciaria o PIC se a tensão de alimentação caísse muito.) 
+.................... #FUSES NOLVP        // Desabilita o "Low Voltage Programming" (Programação em Baixa Tensão). 
+....................                      // Isso é importante pois libera o pino RB3 para uso normal. 
+....................  
+.................... // --- Configuração do Clock (Velocidade) --- 
+.................... #use delay(crystal=20000000) // Informa ao compilador que estamos usando um Cristal de 20MHz. 
+*
+0037:  MOVLW  24
+0038:  MOVWF  04
+0039:  BCF    03.7
+003A:  MOVF   00,W
+003B:  BTFSC  03.2
+003C:  GOTO   04A
+003D:  MOVLW  06
+003E:  MOVWF  78
+003F:  CLRF   77
+0040:  DECFSZ 77,F
+0041:  GOTO   040
+0042:  DECFSZ 78,F
+0043:  GOTO   03F
+0044:  MOVLW  7B
+0045:  MOVWF  77
+0046:  DECFSZ 77,F
+0047:  GOTO   046
+0048:  DECFSZ 00,F
+0049:  GOTO   03D
+004A:  RETURN
+....................                             // Esta informação é ESSENCIAL para que a função delay_ms() 
+....................                             // saiba calcular o tempo de espera corretamente. 
+....................  
+.................... // --- Definições (Não utilizadas neste código específico) --- 
+.................... #define LED PIN_None // Esta linha veio de um template antigo, não é usada aqui. 
+.................... #define DELAY 1000   // Esta linha também não é usada. 
+....................  
+.................... // --- Variáveis Globais --- 
+.................... signed int8 flag = 1; // Esta é a "bandeira de direção". É a variável mais 
+....................                       // importante para a lógica do ping-pong. 
+....................                       // Se flag = 1, o contador SOMA (conta para cima). 
+....................                       // Se flag = -1, o contador SUBTRAI (conta para baixo). 
+....................                       // Começa em 1 para a contagem iniciar subindo. 
+....................  
+.................... // --- Mapas de Bits para os Displays de 7 Segmentos --- 
+.................... // Estes arrays são a "tradução" de um número (ex: 5) para os 
+.................... // bits que precisam ser enviados ao PORTB para acender os segmentos corretos. 
+.................... // IMPORTANTE: Na McLab 1, o PORTB controla TUDO: 
+.................... // 1. Quais segmentos acender (pinos RB0-RB6) 
+.................... // 2. Qual display ligar (um pino de controle para o display da unidade 
+.................... //    e outro para o da dezena, também no PORTB). 
+.................... // Por isso, os valores de 'unidade' e 'dezena' são diferentes para o mesmo número. 
+....................  
+.................... byte const unidade[11] = { 
+....................     0b11111110, //0 
+....................     0b00111000, //1 
+....................     0b11011101, //2 
+....................     0b01111101, //3 
+....................     0b00111011, //4 
+....................     0b01110111, //5 
+....................     0b11110111, //6 
+....................     0b00111100, //7 
+....................     0b11111111, //8 
+....................     0b01111111  //9 
+.................... }; 
+....................  
+.................... byte const dezena[11] = { 
+....................     0b11101110, //0 
+....................     0b00101000, //1 
+....................     0b11001101, //2 
+....................     0b01101101, //3 
+....................     0b00101011, //4 
+....................     0b01100111, //5 
+....................     0b11100111, //6 
+....................     0b00101100, //7 
+....................     0b11101111, //8 
+....................     0b01101111  //9 
+.................... }; 
+....................  
+.................... // ============================================================================== 
+.................... // --- FUNÇÃO PRINCIPAL (Onde tudo acontece) --- 
+.................... // ============================================================================== 
+.................... void main() 
+*
+0070:  MOVF   03,W
+0071:  ANDLW  1F
+0072:  MOVWF  03
+0073:  MOVLW  01
+0074:  MOVWF  20
+0075:  MOVLW  07
+0076:  MOVWF  1F
+0077:  BCF    03.7
+0078:  CLRF   21
+0079:  MOVLW  19
+007A:  MOVWF  23
+.................... { 
+....................     // --- Declaração de Variáveis Locais --- 
+....................     unsigned int i = 0;     // Variável auxiliar. Vai guardar o dígito (0-9) 
+....................                             // que queremos mostrar (seja da dezena ou unidade). 
+....................     unsigned int tempo;     // Variável de controle para o loop 'for' do display. 
+....................     unsigned int cont = 25; // Esta é a variável principal! É o número que 
+....................                             // será mostrado no display. Começa em 25. 
+....................  
+....................     // --- Loop Infinito --- 
+....................     // O microcontrolador ficará "preso" aqui para sempre, 
+....................     // executando o que estiver dentro destas chaves. 
+....................     while (true) 
+....................     { 
+....................  
+....................         // --- ETAPA 1: MOSTRAR O NÚMERO NO DISPLAY (Por 1 segundo) --- 
+....................         // Este loop 'for' é o "motor" do display. Ele aplica a técnica de 
+....................         // MULTIPLEXAÇÃO. Ele pisca tão rápido entre os dois displays 
+....................         // que o olho humano pensa que os dois estão acesos ao mesmo tempo. 
+....................         // 
+....................         // Cálculo do tempo: 
+....................         // O loop roda 100 vezes. 
+....................         // Dentro dele, temos 2 delays de 5ms (5ms + 5ms = 10ms por ciclo). 
+....................         // Total = 100 ciclos * 10ms/ciclo = 1000ms = 1 SEGUNDO. 
+....................         // 
+....................         // Conclusão: Este loop 'for' inteiro serve para mostrar o valor 
+....................         // da variável 'cont' no display por exatamente 1 segundo. 
+....................         for (tempo = 0; tempo < 100; tempo++) 
+007B:  CLRF   22
+007C:  MOVF   22,W
+007D:  SUBLW  63
+007E:  BTFSS  03.0
+007F:  GOTO   0A6
+....................         { 
+....................             // --- Acende o display da DEZENA --- 
+....................             i = cont / 10;          // Pega a parte inteira da divisão (ex: 57 / 10 = 5) 
+0080:  MOVF   23,W
+0081:  MOVWF  24
+0082:  MOVLW  0A
+0083:  MOVWF  25
+0084:  CALL   022
+0085:  MOVF   78,W
+0086:  MOVWF  21
+....................             output_b(dezena[i]);    // Pega o padrão de bits do número 'i' (5) no array 'dezena' 
+0087:  MOVF   21,W
+0088:  CALL   013
+0089:  MOVWF  24
+008A:  BSF    03.5
+008B:  CLRF   06
+008C:  BCF    03.5
+008D:  MOVF   24,W
+008E:  MOVWF  06
+....................                                     // e manda para o PORTB (ligando o display da dezena). 
+....................             delay_ms(5);            // Espera 5 milissegundos com ele aceso. 
+008F:  MOVLW  05
+0090:  MOVWF  24
+0091:  CALL   037
+....................  
+....................             // --- Acende o display da UNIDADE --- 
+....................             i = cont % 10;          // Pega o RESTO da divisão (ex: 57 % 10 = 7) 
+0092:  MOVF   23,W
+0093:  MOVWF  24
+0094:  MOVLW  0A
+0095:  MOVWF  25
+0096:  CALL   022
+0097:  MOVF   77,W
+0098:  MOVWF  21
+....................             output_b(unidade[i]);   // Pega o padrão de bits do número 'i' (7) no array 'unidade' 
+0099:  MOVF   21,W
+009A:  CALL   004
+009B:  MOVWF  24
+009C:  BSF    03.5
+009D:  CLRF   06
+009E:  BCF    03.5
+009F:  MOVF   24,W
+00A0:  MOVWF  06
+....................                                     // e manda para o PORTB (ligando o display da unidade). 
+....................             delay_ms(5);            // Espera 5 milissegundos com ele aceso. 
+00A1:  MOVLW  05
+00A2:  MOVWF  24
+00A3:  CALL   037
+00A4:  INCF   22,F
+00A5:  GOTO   07C
+....................         } 
+....................         // --- Fim do loop do display --- 
+....................         // Neste ponto, 1 segundo se passou. 
+....................  
+....................          
+....................         // --- ETAPA 2: LÓGICA DO CONTADOR "PING-PONG" --- 
+....................         // Esta parte só executa APÓS 1 segundo ter se passado. 
+....................  
+....................         // Atualiza o valor do contador somando a 'flag' 
+....................         // Se flag=1, (cont = cont + 1) -> Sobe (ex: 25 -> 26) 
+....................         // Se flag=-1, (cont = cont + -1) -> Desce (ex: 60 -> 59) 
+....................         cont = cont + flag; 
+00A6:  MOVF   20,W
+00A7:  ADDWF  23,W
+00A8:  MOVWF  23
+....................  
+....................         // Verifica se o contador atingiu um dos limites 
+....................         if (cont >= 60 || cont <= 25) 
+00A9:  MOVF   23,W
+00AA:  SUBLW  3B
+00AB:  BTFSS  03.0
+00AC:  GOTO   0B1
+00AD:  MOVF   23,W
+00AE:  SUBLW  19
+00AF:  BTFSS  03.0
+00B0:  GOTO   0B8
+....................         { 
+....................             // Se o contador chegou em 60 (enquanto subia) 
+....................             // OU 
+....................             // Se o contador chegou em 25 (enquanto descia) 
+....................             // ... então, nós invertemos a direção. 
+....................  
+....................             // Multiplica a 'flag' por -1 para inverter seu sinal: 
+....................             // Se flag era 1 (subindo), vira -1 (começa a descer). 
+....................             // Se flag era -1 (descendo), vira 1 (começa a subir). 
+....................             flag = flag * (-1); 
+00B1:  MOVF   20,W
+00B2:  MOVWF  24
+00B3:  MOVLW  FF
+00B4:  MOVWF  25
+00B5:  GOTO   04B
+00B6:  MOVF   78,W
+00B7:  MOVWF  20
+....................         } 
+00B8:  GOTO   07B
+....................  
+....................     } // Fim do 'while(true)'. O programa volta ao início do 'while', 
+....................       // agora com o NOVO valor de 'cont', e o mostra no display 
+....................       // por mais 1 segundo. 
+.................... } 
+00B9:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F22   NOWDT PUT HS MCLR NOBROWNOUT NOLVP NOCPD NOPROTECT

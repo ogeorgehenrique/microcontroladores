@@ -1,0 +1,68 @@
+#include <16F877A.h>
+
+// --- CONFIGURAÇÕES DO MICROCONTROLADOR ---
+#FUSES NOWDT, NOBROWNOUT, NOLVP, HS
+#use delay(crystal=20000000)
+
+// --- MAPA DE SEGMENTOS (CÁTODO COMUM) ---
+byte const display_map[10] = {
+   0b00111111, // 0
+   0b00000110, // 1
+   0b01011011, // 2
+   0b01001111, // 3
+   0b01100110, // 4
+   0b01101101, // 5
+   0b01111101, // 6
+   0b00000111, // 7
+   0b01111111, // 8
+   0b01101111  // 9
+};
+
+// --- FUNÇÃO PRINCIPAL ---
+void main() {
+   // ================== MUDANÇA IMPORTANTE AQUI ==================
+   // Configura PORTD (segmentos) e PORTA (controle) como SAÍDA.
+   set_tris_d(0x00);
+   set_tris_a(0x00); // Usaremos o PORTA para controle
+   
+   unsigned int16 numero = 0;
+   byte milhar, centena, dezena, unidade;
+   
+   while (TRUE) {
+      
+      // 1. SEPARA O NÚMERO EM DÍGITOS
+      milhar  = (numero / 1000);
+      centena = (numero / 100) % 10;
+      dezena  = (numero / 10) % 10;
+      unidade = numero % 10;
+      
+      // ================== MUDANÇA IMPORTANTE AQUI ==================
+      // 2. EXECUTA A MULTIPLEXAÇÃO USANDO O PORTA
+      
+      // Acende o Display 1 (Milhar) - Controlado por RA2
+      output_a(0b00000100); // Ativa RA2
+      output_d(display_map[milhar]);
+      delay_ms(5);
+      
+      // Acende o Display 2 (Centena) - Controlado por RA3
+      output_a(0b00001000); // Ativa RA3
+      output_d(display_map[centena]);
+      delay_ms(5);
+      
+      // Acende o Display 3 (Dezena) - Controlado por RA4
+      output_a(0b00010000); // Ativa RA4
+      output_d(display_map[dezena]);
+      delay_ms(5);
+      
+      // Acende o Display 4 (Unidade) - Controlado por RA5
+      output_a(0b00100000); // Ativa RA5
+      output_d(display_map[unidade]);
+      delay_ms(5);
+      
+      // 3. ATUALIZA O NÚMERO
+      numero++;
+      if (numero > 9999) {
+         numero = 0;
+      }
+   }
+}

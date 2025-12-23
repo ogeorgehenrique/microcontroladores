@@ -1,0 +1,29 @@
+#include <16F628A.h>
+
+#FUSES NOWDT                    //No Watch Dog Timer
+#FUSES NOBROWNOUT               //No brownout reset
+#FUSES NOLVP                    //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
+
+#use delay(crystal=20000000)
+
+#define LED PIN_None
+#define DELAY 1000
+
+void main()
+{
+//output_b(0);
+   while(true){
+   /*
+   output_high(PIN_B0);
+   output_high(PIN_B2);
+   output_high(PIN_B3);
+   output_high(PIN_B5);
+   output_high(PIN_B6);
+   output_high(PIN_B4); // chave
+   */
+   output_b(0b01111101);
+   delay_ms(10);
+   output_b(0b00101011);
+   delay_ms(10);
+   }
+}

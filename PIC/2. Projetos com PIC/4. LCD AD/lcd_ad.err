@@ -1,0 +1,5 @@
+>>> Warning 202 "lcd_ad.c" Line 52(11,18): Variable never used:   tensao1
+>>> Warning 202 "lcd_ad.c" Line 52(22,29): Variable never used:   tensao2
+      Memory usage:   ROM=9%      RAM=5% - 10%
+      0 Errors,  2 Warnings.
+Build Successful.

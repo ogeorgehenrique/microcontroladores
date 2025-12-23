@@ -1,0 +1,112 @@
+/*
+ * ==============================================================================
+ * PROJETO: Controle de Velocidade do Cooler por Temperatura
+ * PLACA ALVO: PICGenios
+ * MICROCONTROLADOR: PIC16F877A
+ *
+ * DESCRIÇÃO:
+ * Este código lê o sensor de temperatura (AN0 / RA0) e usa esse
+ * valor para controlar a velocidade do COOLER (RC1 / CCP2)
+ * usando o hardware PWM.
+ * ==============================================================================
+ */
+
+#include <16F877A.h> // Biblioteca padrão do PIC16F877A
+
+// Define a resolução do ADC para 10 bits.
+// Isso significa que a leitura do sensor (0-5V) será um número de 0 a 1023.
+#device adc=10
+
+// --- Configuração dos Fuses ---
+#FUSES NOWDT      // Desabilita o Watch Dog Timer
+#FUSES HS         // Oscilador High Speed (para o cristal de 20MHz)
+#FUSES NOPUT      // Desabilita o Power Up Timer
+#FUSES NOPROTECT  // Código não protegido contra leitura
+#FUSES NODEBUG    // Modo Debug desligado
+#FUSES NOBROWNOUT // Desabilita reset por queda de tensão
+#FUSES NOLVP      // DesabilTA baixa tensão (libera pino RB3)
+#FUSES NOCPD      // Proteção de dados da EEPROM desligada
+#FUSES NOWRT      // Memória de programa não protegida contra escrita
+#FUSES RESERVED   // Bits de fuse reservados
+
+// Informa ao compilador que o cristal é de 20MHz
+#use delay(clock=20000000)
+
+/*
+ * ==============================================================================
+ * FUNÇÃO PRINCIPAL
+ * ==============================================================================
+ */
+void main()
+{
+    // Variável para armazenar o valor lido pelo ADC (0-1023)
+    unsigned int16 ton=0; // O nome 'ton' é usado aqui para representar o "Duty Cycle"
+                          // ou "Tempo Ligado" do PWM.
+
+    // --- Configuração dos Periféricos ---
+    
+    // 1. Configuração do Conversor Analógico-Digital (ADC)
+    // Define AN0 (RA0), AN1 (RA1) e AN3 (RA3) como entradas analógicas.
+    setup_adc_ports(AN0_AN1_AN3);
+    // Define a velocidade do clock do ADC.
+    setup_adc(ADC_CLOCK_DIV_16);
+    
+    // 2. Desabilita periféricos não utilizados
+    setup_psp(PSP_DISABLED);
+    setup_spi(SPI_SS_DISABLED);
+    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1);
+    setup_timer_1(T1_DISABLED);
+    
+    // 3. Configuração do Hardware PWM (Módulo CCP1)
+    
+    // ATENÇÃO: O Hardware PWM DEPENDE do Timer 2 para funcionar.
+    // Esta linha configura o Timer 2, que define a FREQUÊNCIA do PWM.
+    // T2_DIV_BY_16: Prescaler do Timer 2
+    // 255: Período (PR2) - Valor máximo do timer
+    // 1: Postscaler
+    setup_timer_2(T2_DIV_BY_16,255,1);
+    
+    // LIGA o módulo CCP1 (no pino RC2) no modo PWM.
+    // A partir deste momento, o hardware do PIC controla o pino RC2
+    // para gerar os pulsos de brilho automaticamente.
+    setup_ccp1(CCP_PWM);
+    
+    // Define um brilho inicial para o PWM.
+    // O valor do "duty cycle" (brilho) vai de 0 até um máximo de 1023
+    // (nesta configuração de timer). 512 é aprox. 50% de brilho.
+    set_pwm1_duty(512);
+    
+    // 4. Desabilita periféricos restantes
+    setup_comparator(NC_NC_NC_NC); // Desliga comparadores
+    setup_vref(FALSE); // Desliga referência de tensão interna
+
+    // 5. Configuração inicial do ADC
+    // Define o Canal 0 (AN0 / RA0) como o canal padrão para leitura
+    set_adc_channel(0);
+    delay_us(50); // Pequena pausa para o canal do ADC estabilizar
+
+    // --- Loop Infinito (Lógica Principal) ---
+    // Este loop é muito eficiente. Ele apenas lê o sensor e
+    // atualiza o hardware PWM. Todo o "piscar" do LED é feito
+    // pelo hardware, liberando o processador.
+    while(true)
+    {
+        // 1. Lê o valor do sensor
+        // A função 'read_adc()' lê o canal que foi selecionado
+        // anteriormente (Canal 0).
+        // 'ton' receberá um valor entre 0 e 1023.
+        ton = read_adc();
+        delay_us(50); // Pausa para a leitura do AD
+        
+        // 2. Atualiza o brilho do LED
+        // 'set_pwm1_duty()' atualiza o "duty cycle" (brilho) do hardware PWM.
+        // Se 'ton' for 300, o brilho será ~30%.
+        // Se 'ton' for 900, o brilho será ~90%.
+        set_pwm1_duty(ton);
+        
+        // 3. Espera 50ms antes de ler o sensor novamente.
+        // Isso evita que o valor mude rápido demais e estabiliza a leitura.
+        delay_ms(50);
+        
+    } // Fim do while(true), o ciclo recomeça
+}

@@ -1,0 +1,23 @@
+[PROJECT]
+Target=botao.hex
+Processor_Text=PIC16F628A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=botao.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Botao\botao]
+Type=4
+[mru-list]
+1=botao.c
+[Opened Files]
+1=botao.c
+2=
+3=
+[botao.c]
+Type=4
+[Units]
+Count=1
+1=botao (main)

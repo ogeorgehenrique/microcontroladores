@@ -1,0 +1,16 @@
+Feito para rodar no PicSimLab com o PIC 16f628a na Boad: McLab 01
+
+*este código implementa um contador "ping-pong" nos dois displays de 7 segmentos.
+- O contador começa em 25, Ele conta subindo (26, 27, 28...) mudando de número a cada 1 segundo.
+- Quando chega em 60, ele inverte a direção.
+- Ele começa a contar descendo (59, 58, 57...) a cada 1 segundo.
+- Quando ele volta para 25, ele inverte a direção novamente e volta a subir.
+- O resultado final é um display que mostra números de 25 a 60, e depois de 60 a 25, repetidamente.
+
+
+
+
+
+
+
+

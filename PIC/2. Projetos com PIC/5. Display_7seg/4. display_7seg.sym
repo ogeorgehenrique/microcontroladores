@@ -1,0 +1,68 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+004-005 @WRITE_PROGRAM_MEMORY8.P2
+008     PSP_DATA
+015     CCP_1_LOW
+015     CCP_1
+016     CCP_1_HIGH
+01B     CCP_2_LOW
+01B     CCP_2
+01C     CCP_2_HIGH
+021     main.contador
+022     main.dezena
+023     main.unidade
+024     main.i
+025     @DIV88.P1
+025     @delay_ms1.P2
+025     main.@SCRATCH1
+026     @DIV88.P1
+027     @DIV88.@SCRATCH1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+09C.6   C1OUT
+09C.7   C2OUT
+10D-10E @WRITE_PROGRAM_MEMORY8.P1
+10D-10E @READ_PROGRAM_MEMORY8.P2
+
+ROM Allocation:
+000004  display_map.call
+000008  display_map.data
+000012  @DIV88
+000027  @delay_ms1
+00003B  @cinit1
+00003B  main
+000045  @cinit2
+
+Project Directory:
+    C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\
+
+Project Files:
+    4. display_7seg.c                                       [15-nov-25 18:07  CRC=122ACA71]
+    ..\..\..\..\..\Program Files (x86)\PICC\Devices\16F877A.h [12-nov-13 14:35  CRC=81334808]
+
+Source signature=14915A81
+
+Units:
+    4. display_7seg (main)
+
+Compiler Settings:
+    Processor:      PIC16F877A
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   4. display_7seg.xsym
+    Errors:      4. display_7seg.err
+    Ext Symbols: 4. display_7seg.esym
+    INHX8:       4. display_7seg.hex
+    Symbols:     4. display_7seg.sym
+    List:        4. display_7seg.lst
+    Debug/COFF:  4. display_7seg.cof
+    Project:     4. display_7seg.ccspjt
+    Call Tree:   4. display_7seg.tre
+    Statistics:  4. display_7seg.STA

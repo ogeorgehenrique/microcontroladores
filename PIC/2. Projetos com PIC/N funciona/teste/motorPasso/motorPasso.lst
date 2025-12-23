@@ -1,0 +1,225 @@
+CCS PCM C Compiler, Version 5.015, 5967               21-nov-25 11:42
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\teste\motorPasso\motorPasso.lst
+
+               ROM used:   112 words (1%)
+                           Largest free fragment is 2048
+               RAM used:   7 (2%) at main() level
+                           8 (2%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   033
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Controle de Motor de Passo (30 RPM) com Reversão 
+....................  * PLACA ALVO: PICGenios 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * - Controla um motor de passo de 1.2 graus/passo. 
+....................  * - Velocidade fixa de 30 RPM (Delay calculado: 6666us). 
+....................  * - Sentido controlado pelo pino RA2 (Chave). 
+....................  * - RA2 = 1 (5V) -> Sentido Horário 
+....................  * - RA2 = 0 (GND) -> Sentido Anti-Horário 
+....................  * 
+....................  * CONEXÕES (PICGenios): 
+....................  * - Motor de Passo: PORTD (RD0, RD1, RD2, RD3) 
+....................  * - Chave de Sentido: PIN_A2 (Ligar DIP Switch correspondente) 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+0004:  BCF    0A.0
+0005:  BCF    0A.1
+0006:  BCF    0A.2
+0007:  ADDWF  02,F
+0008:  RETLW  01
+0009:  RETLW  02
+000A:  RETLW  04
+000B:  RETLW  08
+....................  
+.................... #list 
+....................  
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT, HS, NOPUT, NOPROTECT, NODEBUG, NOBROWNOUT, NOLVP, NOCPD, NOWRT 
+.................... #use delay(clock=20000000) // Cristal de 20MHz 
+000C:  MOVLW  22
+000D:  MOVWF  04
+000E:  BCF    03.7
+000F:  MOVF   00,W
+0010:  BTFSC  03.2
+0011:  GOTO   01F
+0012:  MOVLW  06
+0013:  MOVWF  78
+0014:  CLRF   77
+0015:  DECFSZ 77,F
+0016:  GOTO   015
+0017:  DECFSZ 78,F
+0018:  GOTO   014
+0019:  MOVLW  7B
+001A:  MOVWF  77
+001B:  DECFSZ 77,F
+001C:  GOTO   01B
+001D:  DECFSZ 00,F
+001E:  GOTO   012
+001F:  BCF    0A.3
+0020:  BCF    0A.4
+0021:  GOTO   055 (RETURN)
+0022:  MOVLW  03
+0023:  SUBWF  23,F
+0024:  BTFSS  03.0
+0025:  GOTO   030
+0026:  MOVLW  23
+0027:  MOVWF  04
+0028:  BCF    03.7
+0029:  MOVF   00,W
+002A:  BTFSC  03.2
+002B:  GOTO   030
+002C:  GOTO   02E
+002D:  GOTO   02E
+002E:  DECFSZ 00,F
+002F:  GOTO   02D
+0030:  BCF    0A.3
+0031:  BCF    0A.4
+0032:  GOTO   05A (RETURN)
+....................  
+.................... // --- Mapeamento de Hardware --- 
+.................... // Bobinas do Motor ligadas no PORTD 
+.................... // B1 -> RD0 
+.................... // B2 -> RD1 
+.................... // B3 -> RD2 
+.................... // B4 -> RD3 
+.................... #define CHAVE_SENTIDO PIN_A5 // Chave para controlar a direção 
+....................  
+.................... // --- Sequência de Acionamento (Single Phase / Wave Drive) --- 
+.................... // Sequência solicitada: b1 -> b2 -> b3 -> b4 
+.................... // Em binário (RD3 RD2 RD1 RD0): 
+.................... // Passo 0: 0001 (0x01) 
+.................... // Passo 1: 0010 (0x02) 
+.................... // Passo 2: 0100 (0x04) 
+.................... // Passo 3: 1000 (0x08) 
+.................... const int8 passos[4] = {0x01, 0x02, 0x04, 0x08}; 
+....................  
+.................... void main() { 
+0033:  MOVF   03,W
+0034:  ANDLW  1F
+0035:  MOVWF  03
+0036:  BSF    03.5
+0037:  BSF    1F.0
+0038:  BSF    1F.1
+0039:  BSF    1F.2
+003A:  BCF    1F.3
+003B:  MOVLW  07
+003C:  MOVWF  1C
+003D:  BCF    03.7
+003E:  BCF    03.5
+003F:  CLRF   21
+....................     // Variável para controlar qual passo estamos executando (0 a 3) 
+....................     signed int8 indice = 0; 
+....................  
+....................     // --- Configuração dos Portas --- 
+....................     set_tris_d(0x00); // PORTD todo como SAÍDA (Motor) 
+0040:  MOVLW  00
+0041:  BSF    03.5
+0042:  MOVWF  08
+....................     set_tris_a(0xFF); // PORTA todo como ENTRADA (Chave) 
+0043:  MOVLW  FF
+0044:  MOVWF  05
+....................      
+....................     // Desliga comparadores analógicos para usar PORTA como digital 
+....................     setup_adc_ports(NO_ANALOGS); 
+0045:  BSF    1F.0
+0046:  BSF    1F.1
+0047:  BSF    1F.2
+0048:  BCF    1F.3
+....................  
+....................     while(true) { 
+....................          
+....................         // --- 1. Aciona o Motor --- 
+....................         // Envia o padrão de bits atual para o PORTD 
+....................         output_d(passos[indice]); 
+0049:  BCF    03.5
+004A:  MOVF   21,W
+004B:  CALL   004
+004C:  MOVWF  22
+004D:  BSF    03.5
+004E:  CLRF   08
+004F:  BCF    03.5
+0050:  MOVF   22,W
+0051:  MOVWF  08
+....................  
+....................         // --- 2. Controle de Velocidade (30 RPM) --- 
+....................         // Calculado: 150 passos/segundo -> 6666us por passo 
+....................         delay_us(6666); 
+0052:  MOVLW  06
+0053:  MOVWF  22
+0054:  GOTO   00C
+0055:  MOVLW  03
+0056:  MOVWF  22
+0057:  MOVLW  DD
+0058:  MOVWF  23
+0059:  GOTO   022
+005A:  DECFSZ 22,F
+005B:  GOTO   057
+....................  
+....................         // --- 3. Controle de Sentido --- 
+....................         if (input(CHAVE_SENTIDO)) { 
+005C:  BSF    03.5
+005D:  BSF    05.5
+005E:  BCF    03.5
+005F:  BTFSS  05.5
+0060:  GOTO   069
+....................             // --- Sentido Horário (b1 -> b2 -> b3 -> b4) --- 
+....................             indice++; // Avança na tabela 
+0061:  INCF   21,F
+....................              
+....................             // Verifica limite (Wrap-around) 
+....................             if (indice > 3) { 
+0062:  BTFSC  21.7
+0063:  GOTO   068
+0064:  MOVF   21,W
+0065:  SUBLW  03
+0066:  BTFSS  03.0
+....................                 indice = 0; // Volta para o primeiro passo 
+0067:  CLRF   21
+....................             } 
+....................         }  
+0068:  GOTO   06E
+....................         else { 
+....................             // --- Sentido Anti-Horário (b4 -> b3 -> b2 -> b1) --- 
+....................             indice--; // Recua na tabela 
+0069:  DECF   21,F
+....................              
+....................             // Verifica limite 
+....................             if (indice < 0) { 
+006A:  BTFSS  21.7
+006B:  GOTO   06E
+....................                 indice = 3; // Vai para o último passo 
+006C:  MOVLW  03
+006D:  MOVWF  21
+....................             } 
+....................         } 
+006E:  GOTO   04A
+....................     } 
+.................... } 
+006F:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

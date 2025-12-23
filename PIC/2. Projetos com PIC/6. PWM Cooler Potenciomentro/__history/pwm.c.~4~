@@ -1,0 +1,73 @@
+/*
+ * ==============================================================================
+ * PROJETO: Controle de Velocidade do Cooler por Temperatura
+ * PLACA ALVO: PICGenios
+ * MICROCONTROLADOR: PIC16F877A
+ *
+ * DESCRIÇÃO:
+ * Este código lê o sensor de temperatura (AN0 / RA0) e usa esse
+ * valor para controlar a velocidade do COOLER (RC1 / CCP2)
+ * usando o hardware PWM.
+ * ==============================================================================
+ */
+
+#include <16F877A.h>
+#device adc=10
+#FUSES NOWDT
+#FUSES HS
+#FUSES NOPUT
+#FUSES NOPROTECT
+#FUSES NODEBUG
+#FUSES NOBROWNOUT
+#FUSES NOLVP
+#FUSES NOCPD
+#FUSES NOWRT
+#FUSES RESERVED
+#use delay(clock=20000000)
+
+void main()
+{
+    unsigned int16 ton=0; // Armazena o valor do sensor (0-1023)
+    
+    // --- Configuração do ADC (Entrada) ---
+    setup_adc_ports(AN0_AN1_AN3); // Liga o AN0 (RA0) onde está o sensor
+    setup_adc(ADC_CLOCK_DIV_16);
+    
+    // --- Desabilita periféricos não usados ---
+    setup_psp(PSP_DISABLED);
+    setup_spi(SPI_SS_DISABLED);
+    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1);
+    setup_timer_1(T1_DISABLED);
+    
+    // --- Configuração do PWM (Saída) ---
+    setup_timer_2(T2_DIV_BY_16,255,1); // Timer 2 é a base de tempo do PWM
+    
+    // ## CORREÇÃO 1: Mudar de CCP1 para CCP2 ##
+    // O Cooler está no pino RC1, que é o pino do módulo CCP2
+    setup_ccp2(CCP_PWM); // Alterado de setup_ccp1
+    
+    // ## CORREÇÃO 2: Definir brilho inicial para o PWM 2 ##
+    set_pwm2_duty(512); // Alterado de set_pwm1_duty (50% de velocidade inicial)
+    
+    setup_comparator(NC_NC_NC_NC);
+    setup_vref(FALSE);
+    
+    // Define o canal do sensor de temperatura (AN0) como padrão
+    set_adc_channel(0);
+    delay_us(50);
+    
+    // --- Loop Principal ---
+    while(true){
+    
+        // 1. Lê o valor do sensor de temperatura (0-1023)
+        ton = read_adc();
+        delay_us(50);
+        
+        // 2. Atualiza a velocidade do Cooler (PWM 2)
+        // ## CORREÇÃO 3: Usar a função do PWM 2 ##
+        set_pwm2_duty(ton); // Alterado de set_pwm1_duty
+        
+        // 3. Espera 50ms antes de ler novamente
+        delay_ms(50);
+    }
+}

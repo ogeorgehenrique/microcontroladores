@@ -1,0 +1,24 @@
+[PROJECT]
+Target=7seg.hex
+Processor_Text=PIC16F628A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=7seg.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PROVA\exercicio 2\7seg]
+Type=4
+[mru-list]
+1=7seg.c
+[Opened Files]
+1=7seg.c
+2=..\..\PIC 16F628A\3. Display7seg_2\display7seg_2.c
+3=..\..\PIC 16F628A\1. Botao\botao.c
+4=
+[7seg.c]
+Type=4
+[Units]
+Count=1
+1=7seg (main)

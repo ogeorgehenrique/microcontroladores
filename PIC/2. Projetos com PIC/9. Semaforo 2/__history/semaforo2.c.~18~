@@ -1,0 +1,113 @@
+#include <16F877A.h>
+#device ADC=16
+
+#FUSES NOWDT                    //No Watch Dog Timer
+#FUSES NOBROWNOUT               //No brownout reset
+#FUSES NOLVP    
+#FUSES NOPUT                    //No Power Up Timer
+#FUSES NOPROTECT                //Code not protected from reading
+#FUSES NODEBUG                  //No Debug mode for ICD
+#FUSES BROWNOUT                 //Reset when brownout detected
+#FUSES NOLVP   
+#FUSES NOCPD                    //No EE protection
+#FUSES NOWRT                    //Program memory not write protected
+#FUSES RESERVED  
+
+//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
+
+#use delay(crystal=20000000)
+
+#define LED PIN_None
+#define DELAY 1000
+
+int vermelhoCar = PIN_D2; //Define vermelhoCar no pino D2 - vermelho dos carros
+int amareloCar = PIN_D1; //Define amareloCar no pino D1 - amarelo dos carros
+int verdeCar = PIN_D0; //Define verdeCar no pino D0 - verde dos carros
+int vermelhoPed = PIN_D7; //Define vermelhoPed no pino D7 - vermelho dos pedestres
+int verdePed = PIN_D6; //Define verdePed no pino D6 - verde dos pedestres
+int buttonPin = PIN_B0; //Define buttonPin no pino B0 - botão dos pedestres
+
+
+
+signed int8 flag=1;
+
+byte const unidade[11]={
+   0b11111110, //0
+   0b00111000, //1
+   0b11011101, //2
+   0b01111101, //3
+   0b00111011, //4
+   0b01110111, //5
+   0b11110111, //6
+   0b00111100, //7
+   0b11111111, //8
+   0b01111111 //9
+};
+
+byte const dezena[11]={
+   0b11101110, //0
+   0b00101000, //1
+   0b11001101, //2
+   0b01101101, //3
+   0b00101011, //4
+   0b01100111, //5
+   0b11100111, //6
+   0b00101100, //7
+   0b11101111, //8
+   0b01101111 //9
+};
+
+
+void teste(){
+   unsigned int i=0,tempo,cont = 25;
+   for(tempo=0;tempo<100;tempo++){
+         i = cont/10;
+         output_b(dezena[i]);
+         delay_ms(5);
+         i = cont%10;
+         output_b(unidade[i]);
+         delay_ms(5);
+      }
+      cont=cont+flag;
+      if(cont>=60 || cont<=25){
+         flag=flag*(-1);
+      }
+}
+
+
+void main()
+{
+   setup_adc_ports(NO_ANALOGS);
+   setup_adc(ADC_CLOCK_DIV_2);
+   setup_psp(PSP_DISABLED);
+   setup_spi(SPI_SS_DISABLED);
+   setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1);
+   setup_timer_1(T1_DISABLED);
+   setup_timer_2(T2_DISABLED,0,1);
+   setup_comparator(NC_NC_NC_NC);
+   setup_vref(FALSE);
+   
+   while(true){
+      while (input(buttonPin)){     //Enquanto o botão não for pressionado
+         output_low(verdeCar);      //Liga o LED verde dos carros
+         output_low(vermelhoPed);   //Liga o LED vermelho dos pedestres
+      }
+      
+      delay_ms(10000);              //Intervalo de 10 segundos
+      output_high(verdeCar);        //Desliga o LED verde dos carros
+      output_low(amareloCar);       //Liga o LED amarelo dos carros
+      delay_ms(3000);               //Intervalo de 3 segundos
+      
+      output_high(amareloCar);      //Desliga o LED amarelo dos carros
+      output_low(vermelhoCar);      //Liga o LED vermelho dos carros
+      delay_ms(1000);               //Intervalo de 1 segundo
+      
+      output_high(vermelhoPed);     //Desliga o LED vermelho dos pedestres
+      output_low(verdePed);         //Liga o LED verde dos pedestres
+      delay_ms(10000);              //Intervalo de 10 segundos
+      
+      int i = 0;
+   }
+   
+
+}

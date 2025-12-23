@@ -1,0 +1,3 @@
+Feito para rodar no PicSimLab com o PIC 16F877A na Boad: PicGenios
+
+*esse programa ira fazer os leds B1,B2,B3,B4,B5,B6 e B7 piscarem um de cada vez 

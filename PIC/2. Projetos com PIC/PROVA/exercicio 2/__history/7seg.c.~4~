@@ -1,0 +1,16 @@
+#include <7seg.h>
+
+void main()
+{
+
+   while(TRUE)
+   {
+   output_high(PIN_B0); //g
+   //output_high(PIN_B2);
+   output_high(PIN_B3);
+   output_high(PIN_B5);
+   output_high(PIN_B6);
+   output_high(PIN_B4);
+   }
+
+}

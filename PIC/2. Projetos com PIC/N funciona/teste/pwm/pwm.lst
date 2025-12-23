@@ -1,0 +1,323 @@
+CCS PCM C Compiler, Version 5.015, 5967               21-nov-25 12:21
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\teste\pwm\pwm.lst
+
+               ROM used:   176 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   9 (2%) at main() level
+                           10 (3%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   018
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Controle de Motor DC (Soft-Start / Soft-Stop) 
+....................  * PLACA ALVO: PICGenios (PIC16F877A) 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * - Controla a tensão média aplicada a um motor DC usando PWM. 
+....................  * - Botão START (B1): Inicia a "Rampa de Aceleração" (0% a 100%). 
+....................  * - Botão STOP (B0): Inicia a "Rampa de Desaceleração" (100% a 0%). 
+....................  * - O sinal PWM é gerado pelo hardware CCP1 (Pino RC2). 
+....................  
+....................  
+....................  
+....................  
+.................... Admita que um motor corrente contínua é acionado via microcontrolador e drive. O perfil da tensão (sinal 
+.................... PWM filtrado) aplicada ao motor está desenhado na figura 4. O processo é iniciado quando o operador 
+.................... pressionar o botão start, e 
+.................... finalizado com o botão stop. 
+.................... O sinal de PWM pode ser 
+.................... gerado via CCP ou via 
+.................... software. 
+....................  
+....................  
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device adc=10 // PWM de 10 bits (0 a 1023) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT, HS, NOPUT, NOPROTECT, NODEBUG, NOBROWNOUT, NOLVP, NOCPD, NOWRT 
+.................... #use delay(clock=20000000) 
+0004:  MOVLW  24
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  RETURN
+....................  
+.................... // --- Definição dos Botões --- 
+.................... #define BT_STOP  PIN_B0 
+.................... #define BT_START PIN_B1 
+....................  
+.................... // --- Parâmetros do Perfil (Ajuste conforme a Figura 4) --- 
+.................... #define PASSO_RAMPA 10   // Quanto o PWM aumenta/diminui por ciclo 
+.................... #define DELAY_RAMPA 20   // Tempo entre cada incremento (define a suavidade) 
+....................                          // Quanto maior o delay, mais lenta é a partida. 
+....................  
+.................... void main() { 
+0018:  MOVF   03,W
+0019:  ANDLW  1F
+001A:  MOVWF  03
+001B:  MOVLW  FF
+001C:  MOVWF  20
+001D:  BSF    03.5
+001E:  BSF    1F.0
+001F:  BSF    1F.1
+0020:  BSF    1F.2
+0021:  BCF    1F.3
+0022:  MOVLW  07
+0023:  MOVWF  1C
+0024:  BCF    03.7
+0025:  BCF    03.5
+0026:  CLRF   22
+0027:  CLRF   21
+0028:  BCF    23.0
+....................     // Variável para controlar o Duty Cycle (0 a 1023) 
+....................     unsigned int16 duty = 0; 
+....................      
+....................     // Flag para saber se o motor está ligado ou desligado 
+....................     int1 motor_ligado = 0;  
+....................  
+....................     // --- Configuração dos Botões (Entrada) --- 
+....................     // Configura RB0 e RB1 como entrada 
+....................     // (Na PICGenios, geralmente usamos pull-ups internos ou resistores da placa) 
+....................     port_b_pullups(TRUE);  
+0029:  BSF    03.5
+002A:  BCF    01.7
+....................  
+....................     // --- Configuração do PWM (Hardware CCP1) --- 
+....................     // 1. Configura o Timer 2 (Base de tempo do PWM) 
+....................     setup_timer_2(T2_DIV_BY_16, 255, 1); 
+002B:  MOVLW  00
+002C:  MOVWF  78
+002D:  IORLW  06
+002E:  BCF    03.5
+002F:  MOVWF  12
+0030:  MOVLW  FF
+0031:  BSF    03.5
+0032:  MOVWF  12
+....................      
+....................     // 2. Configura o módulo CCP1 para modo PWM 
+....................     setup_ccp1(CCP_PWM); 
+0033:  BCF    03.5
+0034:  BCF    20.2
+0035:  MOVF   20,W
+0036:  BSF    03.5
+0037:  MOVWF  07
+0038:  BCF    03.5
+0039:  BCF    07.2
+003A:  MOVLW  0C
+003B:  MOVWF  17
+....................      
+....................     // 3. Inicia com motor parado 
+....................     set_pwm1_duty(0); 
+003C:  CLRF   15
+....................  
+....................     // --- Loop Infinito --- 
+....................     while(true) { 
+....................  
+....................         // --------------------------------------------------------- 
+....................         // CENÁRIO 1: COMANDO DE PARTIDA (START - B1) 
+....................         // --------------------------------------------------------- 
+....................         if (!input(BT_START) && !motor_ligado) { 
+003D:  BSF    03.5
+003E:  BSF    06.1
+003F:  BCF    03.5
+0040:  BTFSC  06.1
+0041:  GOTO   07B
+0042:  BTFSC  23.0
+0043:  GOTO   07B
+....................             // Entra no modo ligado 
+....................             motor_ligado = 1; 
+0044:  BSF    23.0
+....................              
+....................             // --- RAMPA DE ACELERAÇÃO (SOFT-START) --- 
+....................             // Aumenta o duty cycle de 0 até 1023 gradualmente 
+....................             for (duty = 0; duty < 1023; duty += PASSO_RAMPA) { 
+0045:  CLRF   22
+0046:  CLRF   21
+0047:  MOVF   22,W
+0048:  SUBLW  03
+0049:  BTFSS  03.0
+004A:  GOTO   073
+004B:  BTFSS  03.2
+004C:  GOTO   051
+004D:  MOVF   21,W
+004E:  SUBLW  FE
+004F:  BTFSS  03.0
+0050:  GOTO   073
+....................                 set_pwm1_duty(duty); 
+0051:  MOVF   22,W
+0052:  MOVWF  79
+0053:  MOVF   21,W
+0054:  MOVWF  78
+0055:  RRF    79,F
+0056:  RRF    78,F
+0057:  RRF    79,F
+0058:  RRF    78,F
+0059:  RRF    79,F
+005A:  MOVF   78,W
+005B:  MOVWF  15
+005C:  RRF    79,F
+005D:  RRF    79,W
+005E:  ANDLW  30
+005F:  MOVWF  77
+0060:  MOVF   17,W
+0061:  ANDLW  CF
+0062:  IORWF  77,W
+0063:  MOVWF  17
+....................                 delay_ms(DELAY_RAMPA); 
+0064:  MOVLW  14
+0065:  MOVWF  24
+0066:  CALL   004
+....................                  
+....................                 // Segurança: Se apertar STOP durante a subida, cancela a subida 
+....................                 if(!input(BT_STOP)) { 
+0067:  BSF    03.5
+0068:  BSF    06.0
+0069:  BCF    03.5
+006A:  BTFSC  06.0
+006B:  GOTO   06E
+....................                    motor_ligado = 0; 
+006C:  BCF    23.0
+....................                    break;  
+006D:  GOTO   073
+....................                 } 
+006E:  MOVLW  0A
+006F:  ADDWF  21,F
+0070:  BTFSC  03.0
+0071:  INCF   22,F
+0072:  GOTO   047
+....................             } 
+....................              
+....................             // Garante que chegou em 100% se não foi cancelado 
+....................             if(motor_ligado) { 
+0073:  BTFSS  23.0
+0074:  GOTO   07B
+....................                 set_pwm1_duty(1023); 
+0075:  MOVLW  FF
+0076:  MOVWF  15
+0077:  MOVF   17,W
+0078:  ANDLW  CF
+0079:  IORLW  30
+007A:  MOVWF  17
+....................             } 
+....................         } 
+....................  
+....................         // --------------------------------------------------------- 
+....................         // CENÁRIO 2: COMANDO DE PARADA (STOP - B0) 
+....................         // --------------------------------------------------------- 
+....................         if (!input(BT_STOP) && motor_ligado) { 
+007B:  BSF    03.5
+007C:  BSF    06.0
+007D:  BCF    03.5
+007E:  BTFSC  06.0
+007F:  GOTO   0AB
+0080:  BTFSS  23.0
+0081:  GOTO   0AB
+....................             // Entra no modo desligado 
+....................             motor_ligado = 0; 
+0082:  BCF    23.0
+....................  
+....................             // --- RAMPA DE DESACELERAÇÃO (SOFT-STOP) --- 
+....................             // Diminui o duty cycle de 1023 até 0 gradualmente 
+....................             for (duty = 1023; duty > 0; duty -= PASSO_RAMPA) { 
+0083:  MOVLW  03
+0084:  MOVWF  22
+0085:  MOVLW  FF
+0086:  MOVWF  21
+0087:  MOVF   21,F
+0088:  BTFSS  03.2
+0089:  GOTO   08D
+008A:  MOVF   22,F
+008B:  BTFSC  03.2
+008C:  GOTO   0AA
+....................                 set_pwm1_duty(duty); 
+008D:  MOVF   22,W
+008E:  MOVWF  79
+008F:  MOVF   21,W
+0090:  MOVWF  78
+0091:  RRF    79,F
+0092:  RRF    78,F
+0093:  RRF    79,F
+0094:  RRF    78,F
+0095:  RRF    79,F
+0096:  MOVF   78,W
+0097:  MOVWF  15
+0098:  RRF    79,F
+0099:  RRF    79,W
+009A:  ANDLW  30
+009B:  MOVWF  77
+009C:  MOVF   17,W
+009D:  ANDLW  CF
+009E:  IORWF  77,W
+009F:  MOVWF  17
+....................                 delay_ms(DELAY_RAMPA); 
+00A0:  MOVLW  14
+00A1:  MOVWF  24
+00A2:  CALL   004
+00A3:  MOVLW  0A
+00A4:  SUBWF  21,F
+00A5:  MOVLW  00
+00A6:  BTFSS  03.0
+00A7:  MOVLW  01
+00A8:  SUBWF  22,F
+00A9:  GOTO   087
+....................                  
+....................                 // (Opcional) Se quiser permitir re-start durante a descida, 
+....................                 // adicionaria lógica aqui. 
+....................             } 
+....................              
+....................             // Garante que parou totalmente (0V) 
+....................             set_pwm1_duty(0); 
+00AA:  CLRF   15
+....................         } 
+....................          
+....................         // Pequeno delay para estabilidade do loop 
+....................         delay_ms(10); 
+00AB:  MOVLW  0A
+00AC:  MOVWF  24
+00AD:  CALL   004
+00AE:  GOTO   03D
+....................     } 
+.................... } 
+00AF:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

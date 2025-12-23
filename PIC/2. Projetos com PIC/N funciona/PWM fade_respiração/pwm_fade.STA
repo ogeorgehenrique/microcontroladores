@@ -1,0 +1,49 @@
+
+ROM used:   215/8192 (3%)
+            215/8192 (3%) including unused fragments
+
+            0.3 Average locations per line
+            11.9 Average locations per statement
+
+RAM used:   10/368 (3%) at main() level
+            18/368 (5%) worst case
+
+Stack used: 1 worst case (1 in main + 0 for interrupts)
+Stack size: 8
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   72    18 100  pwm_fade.c
+  671     0   0  ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F877A.h
+----- -----
+  743    18 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     15   7    1             @delay_us1
+0    159  74    1   518  5.9  main
+0     37  17    5   809  3.4  @DIV1616
+ Inline         0   260  1.9  @cinit1
+
+Program metrics:
+    Functions               3
+    Statements              18
+    Comments                179
+    Volume (V)              1999
+    Difficulty (D)          11.0
+    Effort to implement (E) 21956
+    Time to implement (T)   20 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   10
+    Maintainability (MI)    79
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00003     4  0  
+00004-007FF   211  1833  
+00800-00FFF     0  2048  
+01000-017FF     0  2048  
+01800-01FFF     0  2048  
+
+
+

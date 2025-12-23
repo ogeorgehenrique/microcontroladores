@@ -1,0 +1,173 @@
+/*
+ * ==============================================================================
+ * PROJETO: Sequenciador de Servo Motor
+ * PLACA ALVO: PICGenios (ou similar)
+ * MICROCONTROLADOR: PIC16F877A
+ *
+ * DESCRIÇÃO:
+ * Este programa controla um servo motor conectado ao pino RD2.
+ * Ele usa PWM por SOFTWARE para mover o servo para posições angulares
+ * específicas (0, 45, 90, 180 graus) em uma sequência pré-definida.
+ *
+ * TÉCNICA:
+ * O controle do servo é feito enviando um pulso com uma largura
+ * específica a cada 20ms (50Hz).
+ * - ~800us  = 0 graus
+ * - ~1500us = 90 graus
+ * - ~2200us = 180 graus
+ * ==============================================================================
+ */
+
+#include <16F877A.h> // Biblioteca padrão do PIC16F877A
+#device adc=8        // Define ADC para 8 bits (não usado neste código)
+
+// --- Configuração dos Fuses ---
+#FUSES NOWDT      // Desabilita o Watch Dog Timer
+#FUSES HS         // Oscilador High Speed (para o cristal de 20MHz)
+#FUSES NOPUT      // Desabilita o Power Up Timer
+#FUSES NOPROTECT  // Código não protegido contra leitura
+#FUSES NODEBUG    // Modo Debug desligado
+#FUSES NOBROWNOUT // Desabilita reset por queda de tensão
+#FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3)
+#FUSES NOCPD      // Proteção de dados da EEPROM desligada
+#FUSES NOWRT      // Memória de programa não protegida contra escrita
+#FUSES RESERVED   // Bits de fuse reservados
+
+// Informa ao compilador que o cristal é de 20MHz
+#use delay(clock=20000000)
+
+/*
+ * ==============================================================================
+ * FUNÇÕES DE POSICIONAMENTO DO SERVO
+ * ==============================================================================
+ *
+ * O 'for' loop (i<100) é usado para MANTER o servo na posição.
+ * Ele envia o mesmo pulso 100 vezes.
+ * Cada pulso dura 20ms (ex: 800us + 19200us = 20000us = 20ms).
+ * Tempo total da função = 100 * 20ms = 2000ms = 2 segundos.
+ * Durante 2 segundos, a função "segura" o servo na posição desejada.
+ */
+
+/*
+ * Função: Rotation0
+ * Move o servo para a posição de 0 graus.
+ * Envia um pulso de 800 microssegundos (0.8ms).
+ */
+void Rotation0() //0 Degree
+{
+    unsigned int i;
+    for(i=0; i<100; i++)
+    {
+        output_high(PIN_B0); // Inicia o pulso
+        delay_us(800);       // Largura do pulso para 0°
+        output_low(PIN_B0);  // Termina o pulso
+        delay_us(19200);     // Restante do período de 20ms (20000 - 800)
+    }
+}
+
+/*
+ * Função: Rotation45
+ * Move o servo para a posição de 45 graus.
+ * Envia um pulso de 1150 microssegundos (1.15ms).
+ */
+void Rotation45() //45 Degree
+{
+    unsigned int i;
+    for(i=0; i<100; i++)
+    {
+        output_high(PIN_B0); // Inicia o pulso
+        delay_us(1150);      // Largura do pulso para 45°
+        output_low(PIN_B0);  // Termina o pulso
+        delay_us(18850);     // Restante do período de 20ms (20000 - 1150)
+    }
+}
+
+/*
+ * Função: Rotation90
+ * Move o servo para a posição de 90 graus (posição central).
+ * Envia um pulso de 1500 microssegundos (1.5ms).
+ */
+void Rotation90() //90 Degree
+{
+    unsigned int i;
+    for(i=0; i<100; i++)
+    {
+        output_high(PIN_B0); // Inicia o pulso
+        delay_us(1500);      // Largura do pulso para 90°
+        output_low(PIN_B0);  // Termina o pulso
+        delay_us(18500);     // Restante do período de 20ms (20000 - 1500)
+    }
+}
+
+/*
+ * Função: Rotation180
+ * Move o servo para a posição de 180 graus.
+ * Envia um pulso de 2200 microssegundos (2.2ms).
+ */
+void Rotation180() //180 Degree
+{
+    unsigned int i;
+    for(i=0; i<100; i++)
+    {
+        output_high(PIN_B0); // Inicia o pulso
+        delay_us(2200);      // Largura do pulso para 180°
+        output_low(PIN_B0);  // Termina o pulso
+        delay_us(17800);     // Restante do período de 20ms (20000 - 2200)
+    }
+}
+
+/*
+ * ==============================================================================
+ * FUNÇÃO PRINCIPAL (main)
+ * ==============================================================================
+ */
+void main()
+{
+    // --- Configuração dos Periféricos ---
+    // Desliga todos os módulos que não serão usados neste projeto.
+    setup_adc_ports(NO_ANALOGS); // Pinos como digitais
+    setup_adc(ADC_OFF);          // Desliga módulo ADC
+    setup_psp(PSP_DISABLED);
+    setup_spi(SPI_SS_DISABLED);
+    setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1);
+    setup_timer_1(T1_DISABLED);
+    setup_timer_2(T2_DISABLED,0,1);
+    setup_comparator(NC_NC_NC_NC);
+    setup_vref(FALSE);
+
+    // --- Loop Infinito (Sequência de Movimento) ---
+    while(true)
+    {
+        // 1. Move o servo para 0 graus.
+        //    (A função 'Rotation0' já dura 2 segundos)
+        Rotation0(); 
+        
+        // 2. Espera mais 5 segundos (totalizando 7s em 0°)
+        delay_ms(5000);
+        
+        // 3. Move o servo para 90 graus (dura 2 segundos)
+        Rotation90(); 
+        
+        // 4. Espera mais 2 segundos (totalizando 4s em 90°)
+        delay_ms(2000);
+        
+        // 5. Move o servo para 180 graus (dura 2 segundos)
+        Rotation180(); 
+        
+        // 6. Espera mais 4 segundos (totalizando 6s em 180°)
+        delay_ms(4000);
+        
+        // 7. Move o servo para 45 graus (dura 2 segundos)
+        Rotation45(); 
+        
+        // 8. Espera mais 2 segundos (totalizando 4s em 45°)
+        delay_ms(2000);
+        
+        /*
+        // Bloco de código comentado pelo autor original
+        Rotation75(); // 75 graus
+        delay_ms(2000);
+        */
+        
+    } // Fim do while(true), o ciclo recomeça
+}

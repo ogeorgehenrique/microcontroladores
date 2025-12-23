@@ -1,0 +1,23 @@
+[PROJECT]
+Target=lcd_ad.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=lcd_ad.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\4. LCD AD\lcd_ad]
+Type=4
+[mru-list]
+1=lcd_ad.c
+[Opened Files]
+1=lcd_ad.c
+2=..\3. LCD Ola Mundo\lcd ola mundo.c
+3=
+[lcd_ad.c]
+Type=4
+[Units]
+Count=1
+1=lcd_ad (main)

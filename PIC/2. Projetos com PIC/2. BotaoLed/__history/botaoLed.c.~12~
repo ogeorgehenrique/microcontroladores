@@ -1,0 +1,44 @@
+#include <botaoLed.h>
+
+#define CARRO_VERMELHO  PIN_B1
+//#define CARRO_AMARELO   PIN_B2
+//#define CARRO_VERDE     PIN_B3
+
+#define PED_VERMELHO    PIN_B5
+#define PED_VERDE       PIN_B6
+
+#define BOTAO           PIN_B0  // botão pedestre (ativo em 0)
+
+
+int1 botao_pressionado() {
+   if (!input(BOTAO)) {
+      delay_ms(20);
+      if (!input(BOTAO)) {
+         while (!input(BOTAO)) { delay_ms(10); }
+         return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+void main()
+{
+
+   while(TRUE)
+   {
+       if (botao_pressionado())
+       {
+         output_low(PIN_B1);
+         output_low(PIN_B2);
+         output_low(PIN_B3);
+         output_low(PIN_B4);
+         output_low(PIN_B5);
+         output_low(PIN_B6);
+         output_low(PIN_B7);
+         output_high(PIN_B1);
+         delay_ms(3000);
+         output_low(PIN_B6);
+       }
+
+   }
+}

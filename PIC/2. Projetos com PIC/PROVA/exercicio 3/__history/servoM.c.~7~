@@ -1,0 +1,33 @@
+#include <16F877A.h>
+#device ADC=10 // Leitura de 10 bits (0 a 1023)
+#use delay(crystal=20000000)
+
+#define SERVO_PIN PIN_B0 // Pino de sinal do Servo
+
+void main() {
+   int16 leitura_adc;
+   int16 tempo_pulso;
+   
+   setup_adc_ports(AN0);
+   setup_adc(ADC_CLOCK_INTERNAL);
+   set_adc_channel(0);
+
+   while(TRUE) {
+      // 1. Ler Potenciômetro
+      leitura_adc = read_adc();
+      
+      // 2. Mapear valor do ADC (0-1023) para tempo do pulso (800us - 2200us)
+      // Fórmula: Y = Ymin + (X * (Ymax - Ymin) / Xmax)
+      // Pulso = 800 + (ADC * 1400 / 1023)
+      tempo_pulso = 800 + (leitura_adc * 1400 / 1023);
+
+      // 3. Gerar PWM via Software (Periodo de 20ms)
+      output_high(SERVO_PIN);
+      delay_us(tempo_pulso);       // Parte ALTA variavel
+      output_low(SERVO_PIN);
+      
+      // Completa o ciclo de 20ms (20000us)
+      // delay_us aceita maximo ~65000, entao ok usar variavel
+      delay_us(20000 - tempo_pulso); 
+   }
+}

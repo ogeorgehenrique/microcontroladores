@@ -1,0 +1,15 @@
+#include <botaoLed.h>
+
+void main()
+{
+
+   while(TRUE)
+   {
+      //Ao manter o botâo precionado o led irá acender, se soltar o botao ele apaga
+      if(input(pin_b0)==0)
+      {
+         output_high(pin_b7);
+      }
+   }
+
+}

@@ -1,0 +1,215 @@
+CCS PCM C Compiler, Version 5.015, 5967               02-nov-25 16:13
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Nova pasta\botaoLed.lst
+
+               ROM used:   133 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   6 (2%) at main() level
+                           7 (2%) worst case
+               Stack used: 2 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   036
+0003:  NOP
+.................... #include <botaoLed.h> 
+.................... #include <16F877A.h> 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device ADC=16 
+....................  
+.................... #FUSES NOWDT                 	//No Watch Dog Timer 
+.................... #FUSES NOBROWNOUT            	//No brownout reset 
+.................... #FUSES NOLVP                 	//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=20000000) 
+0004:  MOVLW  22
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  RETURN
+....................  
+....................  
+....................  
+.................... #define BOTAO           PIN_B0  // botão pedestre (ativo em 0) 
+....................  
+....................  
+.................... int1 botao_pressionado() { 
+....................    if (!input(BOTAO)) { 
+0018:  BSF    03.5
+0019:  BSF    06.0
+001A:  BCF    03.5
+001B:  BTFSC  06.0
+001C:  GOTO   031
+....................       delay_ms(20); 
+001D:  MOVLW  14
+001E:  MOVWF  22
+001F:  CALL   004
+....................       if (!input(BOTAO)) { 
+0020:  BSF    03.5
+0021:  BSF    06.0
+0022:  BCF    03.5
+0023:  BTFSC  06.0
+0024:  GOTO   031
+....................          while (!input(BOTAO)) { delay_ms(10); } 
+0025:  BSF    03.5
+0026:  BSF    06.0
+0027:  BCF    03.5
+0028:  BTFSC  06.0
+0029:  GOTO   02E
+002A:  MOVLW  0A
+002B:  MOVWF  22
+002C:  CALL   004
+002D:  GOTO   025
+....................          return TRUE; 
+002E:  MOVLW  01
+002F:  MOVWF  78
+0030:  GOTO   033
+....................       } 
+....................    } 
+....................    return FALSE; 
+0031:  MOVLW  00
+0032:  MOVWF  78
+0033:  BCF    0A.3
+0034:  BCF    0A.4
+0035:  GOTO   043 (RETURN)
+.................... } 
+....................  
+.................... void main() 
+0036:  MOVF   03,W
+0037:  ANDLW  1F
+0038:  MOVWF  03
+0039:  BSF    03.5
+003A:  BSF    1F.0
+003B:  BSF    1F.1
+003C:  BSF    1F.2
+003D:  BCF    1F.3
+003E:  MOVLW  07
+003F:  MOVWF  1C
+0040:  BCF    03.7
+.................... { 
+....................  
+....................    while(TRUE) 
+....................    { 
+....................        if (botao_pressionado()) 
+0041:  BCF    03.5
+0042:  GOTO   018
+0043:  MOVF   78,F
+0044:  BTFSC  03.2
+0045:  GOTO   083
+....................        { 
+....................          output_low(PIN_B1); 
+0046:  BSF    03.5
+0047:  BCF    06.1
+0048:  BCF    03.5
+0049:  BCF    06.1
+....................          delay_ms(100); 
+004A:  MOVLW  64
+004B:  MOVWF  22
+004C:  CALL   004
+....................          output_low(PIN_B2); 
+004D:  BSF    03.5
+004E:  BCF    06.2
+004F:  BCF    03.5
+0050:  BCF    06.2
+....................          delay_ms(100); 
+0051:  MOVLW  64
+0052:  MOVWF  22
+0053:  CALL   004
+....................          output_low(PIN_B3); 
+0054:  BSF    03.5
+0055:  BCF    06.3
+0056:  BCF    03.5
+0057:  BCF    06.3
+....................          delay_ms(100); 
+0058:  MOVLW  64
+0059:  MOVWF  22
+005A:  CALL   004
+....................          output_low(PIN_B4); 
+005B:  BSF    03.5
+005C:  BCF    06.4
+005D:  BCF    03.5
+005E:  BCF    06.4
+....................          output_low(PIN_B5); 
+005F:  BSF    03.5
+0060:  BCF    06.5
+0061:  BCF    03.5
+0062:  BCF    06.5
+....................          delay_ms(100); 
+0063:  MOVLW  64
+0064:  MOVWF  22
+0065:  CALL   004
+....................          output_low(PIN_B6); 
+0066:  BSF    03.5
+0067:  BCF    06.6
+0068:  BCF    03.5
+0069:  BCF    06.6
+....................          delay_ms(100); 
+006A:  MOVLW  64
+006B:  MOVWF  22
+006C:  CALL   004
+....................          output_low(PIN_B7); 
+006D:  BSF    03.5
+006E:  BCF    06.7
+006F:  BCF    03.5
+0070:  BCF    06.7
+....................          delay_ms(100); 
+0071:  MOVLW  64
+0072:  MOVWF  22
+0073:  CALL   004
+....................          output_high(PIN_B1); 
+0074:  BSF    03.5
+0075:  BCF    06.1
+0076:  BCF    03.5
+0077:  BSF    06.1
+....................          delay_ms(3000); 
+0078:  MOVLW  0C
+0079:  MOVWF  21
+007A:  MOVLW  FA
+007B:  MOVWF  22
+007C:  CALL   004
+007D:  DECFSZ 21,F
+007E:  GOTO   07A
+....................          output_high(PIN_B6); 
+007F:  BSF    03.5
+0080:  BCF    06.6
+0081:  BCF    03.5
+0082:  BSF    06.6
+....................        } 
+0083:  GOTO   042
+....................  
+....................    } 
+.................... } 
+0084:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F32   HS NOWDT PUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

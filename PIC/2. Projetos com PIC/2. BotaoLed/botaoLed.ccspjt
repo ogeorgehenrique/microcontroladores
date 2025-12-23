@@ -1,0 +1,25 @@
+[PROJECT]
+Target=botaoLed.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=botaoLed.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Nova pasta\botaoLed]
+Type=4
+[mru-list]
+1=botaoLed.c
+[Opened Files]
+1=botaoLed.c
+2=..\Botao\botao.c
+3=..\display7seg_1\display7_1.c
+4=..\display7seg_1\display7_1.h
+5=
+[botaoLed.c]
+Type=4
+[Units]
+Count=1
+1=botaoLed (main)

@@ -1,0 +1,10 @@
+ÀÄdisplay7seg_2
+   ÀÄmain  0/74  Ram=4
+      ÃÄ@cinit1  (Inline)  Ram=0
+      ÃÄ@DIV88  0/21  Ram=3
+      ÃÄ@const553  0/15  Ram=0
+      ÃÄ@delay_ms1  0/20  Ram=1
+      ÃÄ@DIV88  0/21  Ram=3
+      ÃÄ@const550  0/15  Ram=0
+      ÃÄ@delay_ms1  0/20  Ram=1
+      ÀÄ@MUL88  0/37  Ram=2

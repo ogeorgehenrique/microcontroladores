@@ -1,0 +1,110 @@
+CCS PCM C Compiler, Version 5.015, 5967               29-ago-25 16:09
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\display7seg_1\display7_1.lst
+
+               ROM used:   48 words (2%)
+                           Largest free fragment is 2000
+               RAM used:   5 (2%) at main() level
+                           6 (3%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   018
+0003:  NOP
+.................... #include <display7_1.h> 
+.................... #include <16F628A.h> 
+.................... //////////// Standard Header file for the PIC16F628A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F628A 
+....................  
+.................... #list 
+....................  
+....................  
+.................... #FUSES NOWDT                 	//No Watch Dog Timer 
+.................... #FUSES NOBROWNOUT            	//No brownout reset 
+.................... #FUSES NOLVP                 	//No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=20000000) 
+0004:  MOVLW  21
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  RETURN
+....................  
+.................... #define LED PIN_None 
+.................... #define DELAY 1000 
+....................  
+....................  
+....................  
+....................  
+.................... void main() 
+0018:  MOVF   03,W
+0019:  ANDLW  1F
+001A:  MOVWF  03
+001B:  MOVLW  07
+001C:  MOVWF  1F
+001D:  BCF    03.7
+.................... { 
+.................... //output_b(0); 
+....................    while(true){ 
+....................    /* 
+....................    output_high(PIN_B0); 
+....................    output_high(PIN_B2); 
+....................    output_high(PIN_B3); 
+....................    output_high(PIN_B5); 
+....................    output_high(PIN_B6); 
+....................    output_high(PIN_B4); // chave 
+....................    */ 
+....................    output_b(0b01111101); 
+001E:  BSF    03.5
+001F:  CLRF   06
+0020:  MOVLW  7D
+0021:  BCF    03.5
+0022:  MOVWF  06
+....................    delay_ms(10); 
+0023:  MOVLW  0A
+0024:  MOVWF  21
+0025:  CALL   004
+....................    output_b(0b00101011); 
+0026:  BSF    03.5
+0027:  CLRF   06
+0028:  MOVLW  2B
+0029:  BCF    03.5
+002A:  MOVWF  06
+....................    delay_ms(10); 
+002B:  MOVLW  0A
+002C:  MOVWF  21
+002D:  CALL   004
+002E:  GOTO   01E
+....................    } 
+.................... } 
+002F:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F22   NOWDT PUT HS MCLR NOBROWNOUT NOLVP NOCPD NOPROTECT

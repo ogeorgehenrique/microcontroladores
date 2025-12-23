@@ -1,0 +1,13 @@
+#include <lcd_ad.h>
+
+void main()
+{
+	setup_adc_ports(AN0_AN1_AN3);
+	setup_adc(ADC_CLOCK_DIV_2);
+
+	while(TRUE)
+	{
+		//TODO: User Code
+	}
+
+}

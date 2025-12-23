@@ -1,0 +1,49 @@
+
+ROM used:   161/2048 (8%)
+            161/2048 (8%) including unused fragments
+
+            0.2 Average locations per line
+            7.0 Average locations per statement
+
+RAM used:   7/224 (3%) at main() level
+            12/224 (5%) worst case
+
+Stack used: 2 worst case (2 in main + 0 for interrupts)
+Stack size: 8
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  177    23 100  semaforo.c
+  518     0   0  ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F628A.h
+----- -----
+  695    23 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     20  12    1             @delay_ms1
+0     15   9    0             @const550
+0     15   9    0             @const553
+0     55  34    4   456  8.0  teste
+0     21  13    3             @DIV88
+0     31  19    1   145  2.6  MAIN
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               2
+    Statements              23
+    Comments                235
+    Volume (V)              710
+    Difficulty (D)          9.6
+    Effort to implement (E) 6836
+    Time to implement (T)   6 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   3
+    Maintainability (MI)    56
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00003     4  0  
+00004-007FF   157  1887  
+
+
+

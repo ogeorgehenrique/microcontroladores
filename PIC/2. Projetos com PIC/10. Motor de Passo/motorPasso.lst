@@ -1,0 +1,404 @@
+CCS PCM C Compiler, Version 5.015, 5967               17-nov-25 11:11
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\10. Motor de Passo\motorPasso.lst
+
+               ROM used:   234 words (3%)
+                           Largest free fragment is 2048
+               RAM used:   20 (5%) at main() level
+                           22 (6%) worst case
+               Stack used: 2 locations (1 in main + 1 for interrupts)
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   074
+0003:  NOP
+0004:  MOVWF  7F
+0005:  SWAPF  03,W
+0006:  CLRF   03
+0007:  MOVWF  21
+0008:  MOVF   0A,W
+0009:  MOVWF  20
+000A:  CLRF   0A
+000B:  MOVF   04,W
+000C:  MOVWF  22
+000D:  MOVF   77,W
+000E:  MOVWF  23
+000F:  MOVF   78,W
+0010:  MOVWF  24
+0011:  MOVF   79,W
+0012:  MOVWF  25
+0013:  MOVF   7A,W
+0014:  MOVWF  26
+0015:  BCF    03.7
+0016:  BCF    03.5
+0017:  BTFSS  0B.4
+0018:  GOTO   01B
+0019:  BTFSC  0B.1
+001A:  GOTO   02C
+001B:  MOVF   22,W
+001C:  MOVWF  04
+001D:  MOVF   23,W
+001E:  MOVWF  77
+001F:  MOVF   24,W
+0020:  MOVWF  78
+0021:  MOVF   25,W
+0022:  MOVWF  79
+0023:  MOVF   26,W
+0024:  MOVWF  7A
+0025:  MOVF   20,W
+0026:  MOVWF  0A
+0027:  SWAPF  21,W
+0028:  MOVWF  03
+0029:  SWAPF  7F,F
+002A:  SWAPF  7F,W
+002B:  RETFIE
+002C:  BCF    0A.3
+002D:  BCF    0A.4
+002E:  GOTO   02F
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Controlador de Motor de Passo com Reversão por Interrupção 
+....................  * PLACA ALVO: PICGenios (ou similar) 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este programa faz um motor de passo girar continuamente. 
+....................  * O sentido da rotação é controlado pela variável 'inc'. 
+....................  * 
+....................  * Uma interrupção externa no pino RB0 (Botão B1 na PICGenios) 
+....................  * é usada para inverter o valor de 'inc', mudando instantaneamente 
+....................  * o sentido de rotação do motor. 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+*
+0034:  CLRF   77
+0035:  CLRF   78
+0036:  MOVF   2F,W
+0037:  BCF    03.0
+0038:  BTFSC  30.0
+0039:  ADDWF  77,F
+003A:  RRF    77,F
+003B:  RRF    78,F
+003C:  BTFSC  30.1
+003D:  ADDWF  77,F
+003E:  RRF    77,F
+003F:  RRF    78,F
+0040:  BTFSC  30.2
+0041:  ADDWF  77,F
+0042:  RRF    77,F
+0043:  RRF    78,F
+0044:  BTFSC  30.3
+0045:  ADDWF  77,F
+0046:  RRF    77,F
+0047:  RRF    78,F
+0048:  BTFSC  30.4
+0049:  ADDWF  77,F
+004A:  RRF    77,F
+004B:  RRF    78,F
+004C:  BTFSC  30.5
+004D:  ADDWF  77,F
+004E:  RRF    77,F
+004F:  RRF    78,F
+0050:  BTFSC  30.6
+0051:  ADDWF  77,F
+0052:  RRF    77,F
+0053:  RRF    78,F
+0054:  BTFSC  30.7
+0055:  ADDWF  77,F
+0056:  RRF    77,F
+0057:  RRF    78,F
+....................  
+.................... #list 
+....................  
+.................... #device adc=8        // Define ADC para 8 bits (não usado neste código) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES HS         // Oscilador High Speed (para o cristal de 20MHz) 
+.................... #FUSES NOPUT      // Desabilita o Power Up Timer 
+.................... #FUSES NOPROTECT  // Código não protegido contra leitura 
+.................... #FUSES NODEBUG    // Modo Debug desligado 
+.................... #FUSES BROWNOUT   // ATIVA o reset por queda de tensão 
+.................... #FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3) 
+.................... #FUSES NOCPD      // Proteção de dados da EEPROM desligada 
+.................... #FUSES NOWRT      // Memória de programa não protegida contra escrita 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz 
+.................... #use delay(clock=20000000) 
+*
+005E:  MOVLW  2E
+005F:  MOVWF  04
+0060:  BCF    03.7
+0061:  MOVF   00,W
+0062:  BTFSC  03.2
+0063:  GOTO   071
+0064:  MOVLW  06
+0065:  MOVWF  78
+0066:  CLRF   77
+0067:  DECFSZ 77,F
+0068:  GOTO   067
+0069:  DECFSZ 78,F
+006A:  GOTO   066
+006B:  MOVLW  7B
+006C:  MOVWF  77
+006D:  DECFSZ 77,F
+006E:  GOTO   06D
+006F:  DECFSZ 00,F
+0070:  GOTO   064
+0071:  BCF    0A.3
+0072:  BCF    0A.4
+0073:  GOTO   0E8 (RETURN)
+....................  
+.................... // --- Variáveis Globais de Controle do Motor --- 
+....................  
+.................... /* 
+....................  * Este array define a sequência de "passo completo" (two-phase) 
+....................  * para acionar as bobinas do motor. Os pinos RD0-RD3 são usados. 
+....................  * 3  = 0b00000011 (Bobinas A e B ligadas) 
+....................  * 6  = 0b00000110 (Bobinas B e C ligadas) 
+....................  * 12 = 0b00001100 (Bobinas C e D ligadas) 
+....................  * 9  = 0b00001001 (Bobinas D e A ligadas) 
+....................  */ 
+.................... unsigned int8 posicao[4] = {3, 6, 12, 9}; 
+*
+0084:  MOVLW  03
+0085:  BCF    03.5
+0086:  MOVWF  27
+0087:  MOVLW  06
+0088:  MOVWF  28
+0089:  MOVLW  0C
+008A:  MOVWF  29
+008B:  MOVLW  09
+008C:  MOVWF  2A
+....................  
+.................... // Variável que armazena o passo atual na sequência (índice 0, 1, 2 ou 3) 
+.................... signed int8 passo = 0; 
+....................  
+.................... // Variável de direção (incremento). 
+.................... // Se inc = 1, o motor gira em um sentido (0, 1, 2, 3...) 
+.................... // Se inc = -1, o motor gira no sentido oposto (3, 2, 1, 0...) 
+.................... signed int8 inc = 1; 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO DE INTERRUPÇÃO (ISR) EXTERNA (INT_EXT) 
+....................  * ============================================================================== 
+....................  * Esta diretiva '#INT_EXT' informa ao compilador: 
+....................  * "O código a seguir deve ser executado QUANDO o pino RB0 
+....................  * for pressionado (borda de descida)". 
+....................  */ 
+.................... #INT_EXT 
+.................... void EXT_isr(void) 
+.................... { 
+....................     // Limpa o "aviso" (flag) da interrupção para que ela possa ocorrer novamente 
+....................     clear_interrupt(INT_EXT); 
+*
+002F:  BCF    0B.1
+....................      
+....................     // INVERTE A DIREÇÃO DO MOTOR 
+....................     // Esta linha multiplica a variável de incremento por -1. 
+....................     // Se 'inc' era 1, vira -1. 
+....................     // Se 'inc' era -1, vira 1. 
+....................     inc = inc * (-1); 
+0030:  MOVF   2C,W
+0031:  MOVWF  2F
+0032:  MOVLW  FF
+0033:  MOVWF  30
+*
+0058:  MOVF   78,W
+0059:  MOVWF  2C
+005A:  BCF    0B.1
+005B:  BCF    0A.3
+005C:  BCF    0A.4
+005D:  GOTO   01B
+.................... } 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL (main) 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+*
+0074:  MOVF   03,W
+0075:  ANDLW  1F
+0076:  MOVWF  03
+0077:  CLRF   2B
+0078:  MOVLW  01
+0079:  MOVWF  2C
+007A:  MOVLW  FF
+007B:  MOVWF  2D
+007C:  BSF    03.5
+007D:  BSF    1F.0
+007E:  BSF    1F.1
+007F:  BSF    1F.2
+0080:  BCF    1F.3
+0081:  MOVLW  07
+0082:  MOVWF  1C
+0083:  BCF    03.7
+.................... { 
+....................     // --- Configuração dos Periféricos --- 
+....................     // Desliga todos os módulos que não serão usados 
+....................     setup_adc_ports(NO_ANALOGS); // Pinos como digitais 
+*
+008D:  BSF    03.5
+008E:  BSF    1F.0
+008F:  BSF    1F.1
+0090:  BSF    1F.2
+0091:  BCF    1F.3
+....................     setup_adc(ADC_OFF);          // Desliga módulo ADC 
+0092:  BCF    03.5
+0093:  BCF    1F.0
+....................     setup_psp(PSP_DISABLED); 
+0094:  BSF    03.5
+0095:  BCF    09.4
+....................     setup_spi(SPI_SS_DISABLED); 
+0096:  BCF    03.5
+0097:  BCF    14.5
+0098:  BCF    2D.5
+0099:  MOVF   2D,W
+009A:  BSF    03.5
+009B:  MOVWF  07
+009C:  BCF    03.5
+009D:  BSF    2D.4
+009E:  MOVF   2D,W
+009F:  BSF    03.5
+00A0:  MOVWF  07
+00A1:  BCF    03.5
+00A2:  BCF    2D.3
+00A3:  MOVF   2D,W
+00A4:  BSF    03.5
+00A5:  MOVWF  07
+00A6:  MOVLW  01
+00A7:  BCF    03.5
+00A8:  MOVWF  14
+00A9:  MOVLW  00
+00AA:  BSF    03.5
+00AB:  MOVWF  14
+....................     setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1); 
+00AC:  MOVF   01,W
+00AD:  ANDLW  C7
+00AE:  IORLW  08
+00AF:  MOVWF  01
+....................     setup_timer_1(T1_DISABLED); 
+00B0:  BCF    03.5
+00B1:  CLRF   10
+....................     setup_timer_2(T2_DISABLED,0,1); 
+00B2:  MOVLW  00
+00B3:  MOVWF  78
+00B4:  MOVWF  12
+00B5:  MOVLW  00
+00B6:  BSF    03.5
+00B7:  MOVWF  12
+....................     setup_comparator(NC_NC_NC_NC); 
+00B8:  MOVLW  07
+00B9:  MOVWF  1C
+00BA:  MOVF   05,W
+00BB:  MOVWF  05
+00BC:  MOVLW  10
+00BD:  MOVWF  77
+00BE:  DECFSZ 77,F
+00BF:  GOTO   0BE
+00C0:  NOP
+00C1:  MOVF   1C,W
+00C2:  BCF    03.5
+00C3:  BCF    0D.6
+....................     setup_vref(FALSE); 
+00C4:  BSF    03.5
+00C5:  CLRF   1D
+....................  
+....................     // --- Configuração da Interrupção Externa (RB0) --- 
+....................      
+....................     // Limpa qualquer "lixo" que possa estar na flag de interrupção 
+....................     clear_interrupt(INT_EXT); 
+00C6:  BCF    03.5
+00C7:  BCF    0B.1
+....................      
+....................     // Configura a interrupção para ser ativada na "borda de descida" 
+....................     // (H_TO_L = High to Low), que é o que acontece quando um 
+....................     // botão com pull-up é pressionado. 
+....................     ext_int_edge( H_TO_L ); 
+00C8:  BSF    03.5
+00C9:  BCF    01.6
+....................      
+....................     // Liga a "chave" específica para a interrupção externa (INT_EXT) 
+....................     enable_interrupts(INT_EXT); 
+00CA:  BCF    03.5
+00CB:  BSF    0B.4
+....................     // Liga a "chave geral" que permite que QUALQUER interrupção aconteça 
+....................     enable_interrupts(GLOBAL); 
+00CC:  MOVLW  C0
+00CD:  IORWF  0B,F
+....................  
+....................     // --- Loop Infinito (Lógica do Motor) --- 
+....................     while(true) 
+....................     { 
+....................         // 1. Avança ou retrocede um passo na sequência, 
+....................         //    dependendo do valor de 'inc' (1 ou -1). 
+....................         passo = passo + inc; 
+00CE:  MOVF   2C,W
+00CF:  ADDWF  2B,F
+....................          
+....................         // 2. Lógica de "Wrap-around" (Dar a volta) 
+....................         // Se o passo passou do último (3), volta para o primeiro (0) 
+....................         if(passo > 3) passo = 0; 
+00D0:  BTFSC  2B.7
+00D1:  GOTO   0D6
+00D2:  MOVF   2B,W
+00D3:  SUBLW  03
+00D4:  BTFSS  03.0
+00D5:  CLRF   2B
+....................         // Se o passo foi menor que o primeiro (0), volta para o último (3) 
+....................         if(passo < 0) passo = 3; 
+00D6:  BTFSS  2B.7
+00D7:  GOTO   0DA
+00D8:  MOVLW  03
+00D9:  MOVWF  2B
+....................          
+....................         // 3. ACIONA O MOTOR 
+....................         // Envia o padrão de bits (ex: 0b0011) para o PORTD. 
+....................         // O PORTD está conectado ao driver (ex: ULN2003) que 
+....................         // energiza as bobinas corretas do motor. 
+....................         OUTPUT_D(posicao[passo]); 
+00DA:  MOVLW  27
+00DB:  ADDWF  2B,W
+00DC:  MOVWF  04
+00DD:  BCF    03.7
+00DE:  MOVF   00,W
+00DF:  MOVWF  2E
+00E0:  BSF    03.5
+00E1:  CLRF   08
+00E2:  BCF    03.5
+00E3:  MOVF   2E,W
+00E4:  MOVWF  08
+....................          
+....................         // 4. CONTROLE DE VELOCIDADE 
+....................         // Espera 100ms antes de dar o próximo passo. 
+....................         // Menor o delay, mais rápido o motor gira. 
+....................         delay_ms(100); 
+00E5:  MOVLW  64
+00E6:  MOVWF  2E
+00E7:  GOTO   05E
+00E8:  GOTO   0CE
+....................          
+....................     } // Fim do while(true), repete o ciclo 
+.................... } 
+00E9:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F7A   HS NOWDT NOPUT BROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

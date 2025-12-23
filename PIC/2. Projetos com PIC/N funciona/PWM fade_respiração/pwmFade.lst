@@ -1,0 +1,363 @@
+CCS PCM C Compiler, Version 5.015, 5967               16-nov-25 15:08
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\6. PWM fade_respiração\pwmFade.lst
+
+               ROM used:   215 words (3%)
+                           Largest free fragment is 2048
+               RAM used:   10 (3%) at main() level
+                           18 (5%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   038
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Efeito de "Fade" ou "Respiração" (Breathing) com LED 
+....................  * PLACA ALVO: PICGenios (ou qualquer placa com um LED no pino RD2) 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este código faz um LED aumentar e diminuir seu brilho suavemente, 
+....................  * criando um efeito de "respiração". 
+....................  * 
+....................  * 1. (Fade In): O brilho do LED aumenta de 0% para 100% em 10 segundos. 
+....................  * 2. (Fade Out): O brilho do LED diminui de 100% para 0% em 10 segundos. 
+....................  * 3. O ciclo recomeça indefinidamente. 
+....................  * 
+....................  * TÉCNICA UTILIZADA: 
+....................  * A simulação de brilho é feita usando PWM (Modulação por Largura de Pulso) 
+....................  * por software. O código pisca o LED 1000 vezes por segundo (frequência de 1kHz). 
+....................  * O "brilho" é controlado pela porcentagem de tempo que o LED 
+....................  * fica ACESO (Ton) vs. APAGADO (Toff) dentro de cada ciclo de 1ms (1000us). 
+....................  * 
+....................  * (Ton + Toff = 1000us) 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+0004:  CLRF   78
+0005:  CLRF   79
+0006:  CLRF   77
+0007:  CLRF   7A
+0008:  MOVF   2B,W
+0009:  BTFSS  03.2
+000A:  GOTO   00E
+000B:  MOVF   2A,W
+000C:  BTFSC  03.2
+000D:  GOTO   028
+000E:  MOVLW  10
+000F:  MOVWF  2C
+0010:  BCF    03.0
+0011:  RLF    28,F
+0012:  RLF    29,F
+0013:  RLF    77,F
+0014:  RLF    7A,F
+0015:  MOVF   2B,W
+0016:  SUBWF  7A,W
+0017:  BTFSS  03.2
+0018:  GOTO   01B
+0019:  MOVF   2A,W
+001A:  SUBWF  77,W
+001B:  BTFSS  03.0
+001C:  GOTO   024
+001D:  MOVF   2A,W
+001E:  SUBWF  77,F
+001F:  BTFSS  03.0
+0020:  DECF   7A,F
+0021:  MOVF   2B,W
+0022:  SUBWF  7A,F
+0023:  BSF    03.0
+0024:  RLF    78,F
+0025:  RLF    79,F
+0026:  DECFSZ 2C,F
+0027:  GOTO   010
+0028:  RETURN
+....................  
+.................... #list 
+....................  
+....................  
+.................... #device ADC=10 // Define a resolução do AD para 10 bits (não usado neste código) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES NOBROWNOUT // Desabilita o reset por queda de tensão 
+.................... #FUSES NOLVP      // Desabilita a programação em baixa tensão (libera pino RB3) 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz (essencial para delays) 
+.................... #use delay(crystal=20000000) 
+0029:  MOVLW  03
+002A:  SUBWF  29,F
+002B:  BTFSS  03.0
+002C:  GOTO   037
+002D:  MOVLW  29
+002E:  MOVWF  04
+002F:  BCF    03.7
+0030:  MOVF   00,W
+0031:  BTFSC  03.2
+0032:  GOTO   037
+0033:  GOTO   035
+0034:  GOTO   035
+0035:  DECFSZ 00,F
+0036:  GOTO   034
+0037:  RETURN
+....................  
+.................... // --- Mapeamento de Pinos --- 
+.................... #define LED PIN_D2 // Define o "apelido" LED para o pino RD2 
+....................  
+.................... // --- Variáveis Globais --- 
+.................... int16 Ton=0;  // Armazena o tempo que o LED ficará LIGADO (em microssegundos) 
+.................... int16 Toff=0; // Armazena o tempo que o LED ficará DESLIGADO (em microssegundos) 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+0038:  MOVF   03,W
+0039:  ANDLW  1F
+003A:  MOVWF  03
+003B:  CLRF   21
+003C:  CLRF   20
+003D:  CLRF   23
+003E:  CLRF   22
+003F:  BSF    03.5
+0040:  BSF    1F.0
+0041:  BSF    1F.1
+0042:  BSF    1F.2
+0043:  BCF    1F.3
+0044:  MOVLW  07
+0045:  MOVWF  1C
+0046:  BCF    03.7
+.................... { 
+....................     // Loop infinito que garante que o efeito se repita para sempre 
+....................     while(true) 
+....................     { 
+....................         /* 
+....................          * ================================================================= 
+....................          * LOOP 1: FADE IN (Aumentando o brilho) - Duração: 10 segundos 
+....................          * ================================================================= 
+....................          * Este loop 'for' roda 10.000 vezes. 
+....................          * Cada ciclo do loop dura 1000us (1ms) (Ton + Toff). 
+....................          * Duração total: 10.000 ciclos * 1ms/ciclo = 10.000 ms = 10 segundos. 
+....................          */ 
+....................         for(int16 i=0; i<10000; i++) 
+0047:  BCF    03.5
+0048:  CLRF   25
+0049:  CLRF   24
+004A:  MOVF   25,W
+004B:  SUBLW  27
+004C:  BTFSS  03.0
+004D:  GOTO   08F
+004E:  BTFSS  03.2
+004F:  GOTO   054
+0050:  MOVF   24,W
+0051:  SUBLW  0F
+0052:  BTFSS  03.0
+0053:  GOTO   08F
+....................         { 
+....................             // Acende o LED 
+....................             output_high(LED); 
+0054:  BSF    03.5
+0055:  BCF    08.2
+0056:  BCF    03.5
+0057:  BSF    08.2
+....................              
+....................             // Calcula o tempo que o LED ficará ACESO (Ton) 
+....................             // O 'i' vai de 0 a 10.000. 
+....................             // 'Ton' vai de (0/10)=0us até (10000/10)=1000us. 
+....................             Ton = i/10; 
+0058:  MOVF   25,W
+0059:  MOVWF  29
+005A:  MOVF   24,W
+005B:  MOVWF  28
+005C:  CLRF   2B
+005D:  MOVLW  0A
+005E:  MOVWF  2A
+005F:  CALL   004
+0060:  MOVF   79,W
+0061:  MOVWF  21
+0062:  MOVF   78,W
+0063:  MOVWF  20
+....................              
+....................             // Espera o tempo 'Ton' com o LED aceso 
+....................             delay_us(Ton); 
+0064:  MOVF   21,W
+0065:  MOVWF  28
+0066:  INCF   28,F
+0067:  DECF   28,F
+0068:  BTFSC  03.2
+0069:  GOTO   06E
+006A:  MOVLW  FF
+006B:  MOVWF  29
+006C:  CALL   029
+006D:  GOTO   067
+006E:  MOVF   20,W
+006F:  MOVWF  29
+0070:  CALL   029
+....................              
+....................             // Apaga o LED 
+....................             output_low(LED); 
+0071:  BSF    03.5
+0072:  BCF    08.2
+0073:  BCF    03.5
+0074:  BCF    08.2
+....................              
+....................             // Calcula o tempo restante que o LED ficará APAGADO (Toff) 
+....................             // O período total é 1000us. 
+....................             // Se Ton=300us, Toff=700us. Se Ton=900us, Toff=100us. 
+....................             Toff = 1000 - Ton; 
+0075:  MOVF   20,W
+0076:  SUBLW  E8
+0077:  MOVWF  22
+0078:  MOVLW  03
+0079:  MOVWF  23
+007A:  MOVF   21,W
+007B:  BTFSS  03.0
+007C:  INCFSZ 21,W
+007D:  SUBWF  23,F
+....................              
+....................             // Espera o tempo 'Toff' com o LED apagado 
+....................             delay_us(Toff); 
+007E:  MOVF   23,W
+007F:  MOVWF  28
+0080:  INCF   28,F
+0081:  DECF   28,F
+0082:  BTFSC  03.2
+0083:  GOTO   088
+0084:  MOVLW  FF
+0085:  MOVWF  29
+0086:  CALL   029
+0087:  GOTO   081
+0088:  MOVF   22,W
+0089:  MOVWF  29
+008A:  CALL   029
+008B:  INCF   24,F
+008C:  BTFSC  03.2
+008D:  INCF   25,F
+008E:  GOTO   04A
+....................         } 
+....................          
+....................         /* 
+....................          * ================================================================= 
+....................          * LOOP 2: FADE OUT (Diminuindo o brilho) - Duração: 10 segundos 
+....................          * ================================================================= 
+....................          * Este loop 'for' roda 10.000 vezes (de 10.000 para 0). 
+....................          * Cada ciclo também dura 1000us (1ms). 
+....................          * Duração total: 10.000 ciclos * 1ms/ciclo = 10.000 ms = 10 segundos. 
+....................          */ 
+....................         for(int16 j=10000; j>0; j--) 
+008F:  MOVLW  27
+0090:  MOVWF  27
+0091:  MOVLW  10
+0092:  MOVWF  26
+0093:  MOVF   26,F
+0094:  BTFSS  03.2
+0095:  GOTO   099
+0096:  MOVF   27,F
+0097:  BTFSC  03.2
+0098:  GOTO   0D5
+....................         { 
+....................             // Acende o LED 
+....................             output_high(LED); 
+0099:  BSF    03.5
+009A:  BCF    08.2
+009B:  BCF    03.5
+009C:  BSF    08.2
+....................              
+....................             // Calcula o tempo que o LED ficará ACESO (Ton) 
+....................             // O 'j' vai de 10.000 para 0. 
+....................             // 'Ton' vai de (10000/10)=1000us até (0/10)=0us. 
+....................             Ton = j/10; 
+009D:  MOVF   27,W
+009E:  MOVWF  29
+009F:  MOVF   26,W
+00A0:  MOVWF  28
+00A1:  CLRF   2B
+00A2:  MOVLW  0A
+00A3:  MOVWF  2A
+00A4:  CALL   004
+00A5:  MOVF   79,W
+00A6:  MOVWF  21
+00A7:  MOVF   78,W
+00A8:  MOVWF  20
+....................              
+....................             // Espera o tempo 'Ton' com o LED aceso 
+....................             delay_us(Ton); 
+00A9:  MOVF   21,W
+00AA:  MOVWF  28
+00AB:  INCF   28,F
+00AC:  DECF   28,F
+00AD:  BTFSC  03.2
+00AE:  GOTO   0B3
+00AF:  MOVLW  FF
+00B0:  MOVWF  29
+00B1:  CALL   029
+00B2:  GOTO   0AC
+00B3:  MOVF   20,W
+00B4:  MOVWF  29
+00B5:  CALL   029
+....................              
+....................             // Apaga o LED 
+....................             output_low(LED); 
+00B6:  BSF    03.5
+00B7:  BCF    08.2
+00B8:  BCF    03.5
+00B9:  BCF    08.2
+....................              
+....................             // Calcula o tempo restante que o LED ficará APAGADO (Toff) 
+....................             Toff = 1000 - Ton; 
+00BA:  MOVF   20,W
+00BB:  SUBLW  E8
+00BC:  MOVWF  22
+00BD:  MOVLW  03
+00BE:  MOVWF  23
+00BF:  MOVF   21,W
+00C0:  BTFSS  03.0
+00C1:  INCFSZ 21,W
+00C2:  SUBWF  23,F
+....................              
+....................             // Espera o tempo 'Toff' com o LED apagado 
+....................             delay_us(Toff); 
+00C3:  MOVF   23,W
+00C4:  MOVWF  28
+00C5:  INCF   28,F
+00C6:  DECF   28,F
+00C7:  BTFSC  03.2
+00C8:  GOTO   0CD
+00C9:  MOVLW  FF
+00CA:  MOVWF  29
+00CB:  CALL   029
+00CC:  GOTO   0C6
+00CD:  MOVF   22,W
+00CE:  MOVWF  29
+00CF:  CALL   029
+00D0:  MOVF   26,W
+00D1:  BTFSC  03.2
+00D2:  DECF   27,F
+00D3:  DECF   26,F
+00D4:  GOTO   093
+....................         } 
+00D5:  GOTO   048
+....................          
+....................     } // Fim do while(true), o ciclo recomeça 
+.................... } 
+00D6:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F32   HS NOWDT PUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

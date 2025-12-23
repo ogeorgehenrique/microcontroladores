@@ -1,0 +1,3 @@
+Feito para rodar no PicSimLab com o PIC 16f628a na Boad: McLab 01
+
+*esse código ativa o display de 7 seguimentos fazendo com que o numero 47 seja exibido e fique aceso para sempre 

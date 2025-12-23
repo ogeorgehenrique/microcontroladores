@@ -1,0 +1,77 @@
+
+/*
+A frequência (f) é quantas vezes o LED pisca por segundo. O período total (T) é 1000ms/f.
+Como queremos que ele acenda e apague (50% ligado, 50% desligado),
+o tempo de troca (Toggle) é a metade do período.
+LED 1 (12 Hz): 1000/12 = 83ms. Troca a cada 41ms.
+LED 2 (35 Hz): 1000/35 = 28ms. Troca a cada 14ms.
+LED 3 (1055 Hz): 1000/1055 = 0,95ms. Troca a cada 0,475ms.
+*/
+
+#include <16F877A.h>
+#device ADC=16
+
+#FUSES NOWDT                    //No Watch Dog Timer
+#FUSES NOBROWNOUT               //No brownout reset
+#FUSES NOLVP                    //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O
+
+#use delay(crystal=20000000)
+
+#define LED1 PIN_D1
+#define LED2 PIN_D2
+#define LED3 PIN_D3
+
+// --- Definição dos Tempos de Troca (Calculados acima) ---
+#define TEMPO_LED1 41 // 12 Hz
+#define TEMPO_LED2 14 // 35 Hz
+#define TEMPO_LED3 0,475 // 1055 Hz
+
+
+
+
+void main()
+{
+      // Configura o PORTD como saída (onde estão os LEDs)
+    set_tris_d(0x00);
+    //output_d(0x00); // Começa com tudo apagado
+
+    // --- Variáveis Contadoras ---
+    // Elas vão contar quantos milissegundos se passaram para cada LED
+    unsigned int16 cont1 = 0;
+    unsigned int16 cont2 = 0;
+    unsigned int16 cont3 = 0;
+  
+   
+   while(TRUE)
+   {
+      // --- BASE DE TEMPO (O Coração do Código) ---
+        // Atrasamos apenas 1ms por ciclo. Isso é rápido o suficiente
+        // para parecer que tudo está acontecendo ao mesmo tempo.
+        delay_ms(1);
+
+        // Incrementa todos os contadores
+        cont1++;
+        cont2++;
+        cont3++;
+        
+
+        // --- Lógica do LED 1 (2 Hz) ---
+        if (cont1 >= TEMPO_LED1) {
+            output_toggle(LED1); // Inverte o estado do LED
+            cont1 = 0;           // Reinicia o contador dele
+        }
+
+        // --- Lógica do LED 2 (3 Hz) ---
+        if (cont2 >= TEMPO_LED2) {
+            output_toggle(LED2);
+            cont2 = 0;
+        }
+
+        // --- Lógica do LED 3 (5 Hz) ---
+        if (cont3 >= TEMPO_LED3) {
+            output_toggle(LED3);
+            cont3 = 0;
+        }
+   }
+
+}

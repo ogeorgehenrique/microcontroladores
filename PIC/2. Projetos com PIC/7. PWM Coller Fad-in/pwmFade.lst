@@ -1,0 +1,438 @@
+CCS PCM C Compiler, Version 5.015, 5967               16-nov-25 17:20
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Nova pasta\pwmFade.lst
+
+               ROM used:   258 words (3%)
+                           Largest free fragment is 2048
+               RAM used:   12 (3%) at main() level
+                           13 (4%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   013
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Efeito de "Fade" ou "Respiração" (Breathing) com LED 
+....................  * PLACA ALVO: PICGenios 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este código cria um efeito de "fade" (aumento e diminuição suave 
+....................  * de brilho) em um LED conectado ao pino RC2 (LED RL1 na PICGenios). 
+....................  * O brilho é controlado por PWM (Modulação por Largura de Pulso) 
+....................  * implementado via SOFTWARE, usando delays manuais. 
+....................  * 
+....................  * 1. (Fade In): O brilho aumenta de 0% para 100% em 5 segundos. 
+....................  * 2. (Fade Out): O brilho diminui de 100% para 0% em 5 segundos. 
+....................  * 3. O ciclo se repete. 
+....................  * 
+....................  * NOTA: As configurações do ADC (Conversor A/D) são iniciadas, 
+....................  * mas não são usadas no loop principal (são "código morto"). 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device adc=10       // Define a resolução do ADC para 10 bits (não usado aqui) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES HS         // Oscilador High Speed (para o cristal de 20MHz) 
+.................... #FUSES NOPUT      // Desabilita o Power Up Timer 
+.................... #FUSES NOPROTECT  // Código não protegido contra leitura 
+.................... #FUSES NODEBUG    // Modo Debug desligado 
+.................... #FUSES BROWNOUT   // ATIVA o reset por queda de tensão (Brownout) 
+.................... #FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3) 
+.................... #FUSES NOCPD      // Proteção de dados da EEPROM desligada 
+.................... #FUSES NOWRT      // Memória de programa não protegida contra escrita 
+.................... #FUSES RESERVED   // Bits de fuse reservados 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz 
+.................... #use delay(clock=20000000) 
+0004:  MOVLW  03
+0005:  SUBWF  27,F
+0006:  BTFSS  03.0
+0007:  GOTO   012
+0008:  MOVLW  27
+0009:  MOVWF  04
+000A:  BCF    03.7
+000B:  MOVF   00,W
+000C:  BTFSC  03.2
+000D:  GOTO   012
+000E:  GOTO   010
+000F:  GOTO   010
+0010:  DECFSZ 00,F
+0011:  GOTO   00F
+0012:  RETURN
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+0013:  MOVF   03,W
+0014:  ANDLW  1F
+0015:  MOVWF  03
+0016:  MOVLW  FF
+0017:  MOVWF  20
+0018:  BSF    03.5
+0019:  BSF    1F.0
+001A:  BSF    1F.1
+001B:  BSF    1F.2
+001C:  BCF    1F.3
+001D:  MOVLW  07
+001E:  MOVWF  1C
+001F:  BCF    03.7
+0020:  BCF    03.5
+0021:  CLRF   22
+0022:  CLRF   21
+0023:  CLRF   24
+0024:  CLRF   23
+0025:  CLRF   25
+.................... { 
+....................     // --- Declaração de Variáveis --- 
+....................     unsigned int16 ton=0, toff=0; // 'ton' = Tempo Ligado (em microssegundos) 
+....................                                  // 'toff' = Tempo Desligado (em microssegundos) 
+....................     unsigned int8 cont = 0;      // Variável de controle para o loop interno (velocidade) 
+....................  
+....................     // ========================================================================== 
+....................     // --- CONFIGURAÇÃO DOS PERIFÉRICOS (A MAIORIA NÃO É USADA) --- 
+....................     // Este bloco é "código morto", provavelmente copiado de outro projeto. 
+....................     // O programa não chama 'read_adc()' no loop principal. 
+....................      
+....................     // configuração do AD 
+....................     setup_adc_ports(AN0_AN1_AN3); // Configura pinos analógicos 
+0026:  BSF    03.5
+0027:  BCF    1F.0
+0028:  BCF    1F.1
+0029:  BSF    1F.2
+002A:  BCF    1F.3
+....................     setup_adc(ADC_CLOCK_DIV_16);  // Configura velocidade do AD 
+002B:  BSF    1F.6
+002C:  BCF    03.5
+002D:  BSF    1F.6
+002E:  BCF    1F.7
+002F:  BSF    03.5
+0030:  BSF    1F.7
+0031:  BCF    03.5
+0032:  BSF    1F.0
+....................     setup_psp(PSP_DISABLED);      // Desabilita porta paralela 
+0033:  BSF    03.5
+0034:  BCF    09.4
+....................     setup_spi(SPI_SS_DISABLED);   // Desabilita SPI 
+0035:  BCF    03.5
+0036:  BCF    14.5
+0037:  BCF    20.5
+0038:  MOVF   20,W
+0039:  BSF    03.5
+003A:  MOVWF  07
+003B:  BCF    03.5
+003C:  BSF    20.4
+003D:  MOVF   20,W
+003E:  BSF    03.5
+003F:  MOVWF  07
+0040:  BCF    03.5
+0041:  BCF    20.3
+0042:  MOVF   20,W
+0043:  BSF    03.5
+0044:  MOVWF  07
+0045:  MOVLW  01
+0046:  BCF    03.5
+0047:  MOVWF  14
+0048:  MOVLW  00
+0049:  BSF    03.5
+004A:  MOVWF  14
+....................     setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1); // Configura Timer 0 
+004B:  MOVF   01,W
+004C:  ANDLW  C7
+004D:  IORLW  08
+004E:  MOVWF  01
+....................     setup_timer_1(T1_DISABLED);   // Desabilita Timer 1 
+004F:  BCF    03.5
+0050:  CLRF   10
+....................      
+....................     // Desabilita o Timer 2. Isso confirma que o PWM por HARDWARE 
+....................     // (que depende do Timer 2) não está sendo usado. 
+....................     setup_timer_2(T2_DISABLED,0,1);  
+0051:  MOVLW  00
+0052:  MOVWF  78
+0053:  MOVWF  12
+0054:  MOVLW  00
+0055:  BSF    03.5
+0056:  MOVWF  12
+....................      
+....................     setup_comparator(NC_NC_NC_NC); // Desliga comparadores 
+0057:  MOVLW  07
+0058:  MOVWF  1C
+0059:  MOVF   05,W
+005A:  MOVWF  05
+005B:  MOVLW  10
+005C:  MOVWF  77
+005D:  DECFSZ 77,F
+005E:  GOTO   05D
+005F:  NOP
+0060:  MOVF   1C,W
+0061:  BCF    03.5
+0062:  BCF    0D.6
+....................     setup_vref(FALSE);             // Desliga referência de tensão 
+0063:  BSF    03.5
+0064:  CLRF   1D
+....................      
+....................     // Define o canal do AD como 0, mas nunca lê o valor. 
+....................     set_adc_channel(0); 
+0065:  MOVLW  00
+0066:  MOVWF  78
+0067:  BCF    03.5
+0068:  MOVF   1F,W
+0069:  ANDLW  C7
+006A:  IORWF  78,W
+006B:  MOVWF  1F
+....................     delay_us(50); 
+006C:  MOVLW  52
+006D:  MOVWF  77
+006E:  DECFSZ 77,F
+006F:  GOTO   06E
+0070:  GOTO   071
+0071:  NOP
+....................     // --- FIM DO BLOCO DE CONFIGURAÇÃO NÃO UTILIZADO --- 
+....................     // ========================================================================== 
+....................  
+....................  
+....................     // --- Loop Infinito Principal --- 
+....................     while(true) 
+....................     { 
+....................         /* 
+....................          * ================================================================= 
+....................          * LOOP 1: FADE IN (Aumentando o brilho) - Duração: 5 segundos 
+....................          * ================================================================= 
+....................          * O loop externo 'for' controla o brilho ('ton'), 
+....................          * variando de 1 (brilho 0,1%) até 1000 (brilho 100%). 
+....................          */ 
+....................         for(ton=1; ton<=1000; ton++) 
+0072:  CLRF   22
+0073:  MOVLW  01
+0074:  MOVWF  21
+0075:  MOVF   22,W
+0076:  SUBLW  03
+0077:  BTFSS  03.0
+0078:  GOTO   0BA
+0079:  BTFSS  03.2
+007A:  GOTO   07F
+007B:  MOVF   21,W
+007C:  SUBLW  E8
+007D:  BTFSS  03.0
+007E:  GOTO   0BA
+....................         { 
+....................             /* 
+....................              * O loop interno 'for' (cont) controla a VELOCIDADE do fade. 
+....................              * Ele repete o mesmo nível de brilho 5 vezes. 
+....................              * Cada ciclo dura 1ms (ton + toff). 
+....................              * Tempo por passo de brilho = 5 * 1ms = 5ms 
+....................              * Tempo total do Fade In = 1000 passos * 5ms/passo = 5000ms = 5 segundos. 
+....................              */ 
+....................             for(cont=1; cont<=5; cont++) 
+007F:  MOVLW  01
+0080:  MOVWF  25
+0081:  MOVF   25,W
+0082:  SUBLW  05
+0083:  BTFSS  03.0
+0084:  GOTO   0B6
+....................             { 
+....................                 // --- Bloco de PWM por Software (Período total = 1000us) --- 
+....................                  
+....................                 // 1. Liga o LED (no pino RC2) 
+....................                 output_high(PIN_C2); 
+0085:  BCF    20.2
+0086:  MOVF   20,W
+0087:  BSF    03.5
+0088:  MOVWF  07
+0089:  BCF    03.5
+008A:  BSF    07.2
+....................                 // 2. Mantém o LED ligado pelo tempo 'ton' 
+....................                 delay_us(ton);  
+008B:  MOVF   22,W
+008C:  MOVWF  26
+008D:  INCF   26,F
+008E:  DECF   26,F
+008F:  BTFSC  03.2
+0090:  GOTO   095
+0091:  MOVLW  FF
+0092:  MOVWF  27
+0093:  CALL   004
+0094:  GOTO   08E
+0095:  MOVF   21,W
+0096:  MOVWF  27
+0097:  CALL   004
+....................                  
+....................                 // 3. Calcula o tempo que o LED deve ficar desligado 
+....................                 //    para completar o período de 1000us (1ms). 
+....................                 toff = 1000 - ton; 
+0098:  MOVF   21,W
+0099:  SUBLW  E8
+009A:  MOVWF  23
+009B:  MOVLW  03
+009C:  MOVWF  24
+009D:  MOVF   22,W
+009E:  BTFSS  03.0
+009F:  INCFSZ 22,W
+00A0:  SUBWF  24,F
+....................                  
+....................                 // 4. Desliga o LED 
+....................                 output_low(PIN_C2); 
+00A1:  BCF    20.2
+00A2:  MOVF   20,W
+00A3:  BSF    03.5
+00A4:  MOVWF  07
+00A5:  BCF    03.5
+00A6:  BCF    07.2
+....................                 // 5. Mantém o LED desligado pelo tempo 'toff' 
+....................                 delay_us(toff);  
+00A7:  MOVF   24,W
+00A8:  MOVWF  26
+00A9:  INCF   26,F
+00AA:  DECF   26,F
+00AB:  BTFSC  03.2
+00AC:  GOTO   0B1
+00AD:  MOVLW  FF
+00AE:  MOVWF  27
+00AF:  CALL   004
+00B0:  GOTO   0AA
+00B1:  MOVF   23,W
+00B2:  MOVWF  27
+00B3:  CALL   004
+00B4:  INCF   25,F
+00B5:  GOTO   081
+....................             } 
+00B6:  INCF   21,F
+00B7:  BTFSC  03.2
+00B8:  INCF   22,F
+00B9:  GOTO   075
+....................         } // Fim do Fade In (Brilho está em 100%) 
+....................  
+....................         /* 
+....................          * ================================================================= 
+....................          * LOOP 2: FADE OUT (Diminuindo o brilho) - Duração: 5 segundos 
+....................          * ================================================================= 
+....................          * O loop externo 'for' agora faz o oposto: 
+....................          * varia o brilho ('ton') de 1000 (100%) de volta para 1 (0,1%). 
+....................          */ 
+....................         for(ton=1000; ton>0; ton--) 
+00BA:  MOVLW  03
+00BB:  MOVWF  22
+00BC:  MOVLW  E8
+00BD:  MOVWF  21
+00BE:  MOVF   21,F
+00BF:  BTFSS  03.2
+00C0:  GOTO   0C4
+00C1:  MOVF   22,F
+00C2:  BTFSC  03.2
+00C3:  GOTO   100
+....................         { 
+....................             /* 
+....................              * O loop interno de velocidade é idêntico. 
+....................              * Tempo total do Fade Out = 1000 passos * 5ms/passo = 5000ms = 5 segundos. 
+....................              */ 
+....................             for(cont=1; cont<=5; cont++) 
+00C4:  MOVLW  01
+00C5:  MOVWF  25
+00C6:  MOVF   25,W
+00C7:  SUBLW  05
+00C8:  BTFSS  03.0
+00C9:  GOTO   0FB
+....................             { 
+....................                 // --- Bloco de PWM por Software (Período total = 1000us) --- 
+....................                  
+....................                 // 1. Liga o LED 
+....................                 output_high(PIN_C2); 
+00CA:  BCF    20.2
+00CB:  MOVF   20,W
+00CC:  BSF    03.5
+00CD:  MOVWF  07
+00CE:  BCF    03.5
+00CF:  BSF    07.2
+....................                 // 2. Mantém ligado por 'ton' (que agora está diminuindo) 
+....................                 delay_us(ton); 
+00D0:  MOVF   22,W
+00D1:  MOVWF  26
+00D2:  INCF   26,F
+00D3:  DECF   26,F
+00D4:  BTFSC  03.2
+00D5:  GOTO   0DA
+00D6:  MOVLW  FF
+00D7:  MOVWF  27
+00D8:  CALL   004
+00D9:  GOTO   0D3
+00DA:  MOVF   21,W
+00DB:  MOVWF  27
+00DC:  CALL   004
+....................                  
+....................                 // 3. Calcula o tempo desligado 
+....................                 toff = 1000 - ton; 
+00DD:  MOVF   21,W
+00DE:  SUBLW  E8
+00DF:  MOVWF  23
+00E0:  MOVLW  03
+00E1:  MOVWF  24
+00E2:  MOVF   22,W
+00E3:  BTFSS  03.0
+00E4:  INCFSZ 22,W
+00E5:  SUBWF  24,F
+....................                  
+....................                 // 4. Desliga o LED 
+....................                 output_low(PIN_C2); 
+00E6:  BCF    20.2
+00E7:  MOVF   20,W
+00E8:  BSF    03.5
+00E9:  MOVWF  07
+00EA:  BCF    03.5
+00EB:  BCF    07.2
+....................                 // 5. Mantém desligado por 'toff' 
+....................                 delay_us(toff);  
+00EC:  MOVF   24,W
+00ED:  MOVWF  26
+00EE:  INCF   26,F
+00EF:  DECF   26,F
+00F0:  BTFSC  03.2
+00F1:  GOTO   0F6
+00F2:  MOVLW  FF
+00F3:  MOVWF  27
+00F4:  CALL   004
+00F5:  GOTO   0EF
+00F6:  MOVF   23,W
+00F7:  MOVWF  27
+00F8:  CALL   004
+00F9:  INCF   25,F
+00FA:  GOTO   0C6
+....................             } 
+00FB:  MOVF   21,W
+00FC:  BTFSC  03.2
+00FD:  DECF   22,F
+00FE:  DECF   21,F
+00FF:  GOTO   0BE
+....................         } // Fim do Fade Out (Brilho está em 0%) 
+0100:  GOTO   072
+....................          
+....................     } // Fim do while(true), o ciclo todo recomeça 
+.................... } 
+0101:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F7A   HS NOWDT NOPUT BROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

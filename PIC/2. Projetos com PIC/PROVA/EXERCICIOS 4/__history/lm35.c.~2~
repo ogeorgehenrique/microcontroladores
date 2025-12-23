@@ -1,0 +1,27 @@
+#include <lm35.h>
+
+
+#ifndef lcd_enable
+#define lcd_enable pin_E1 // pino enable (E) do LCD -> conectado ao RE1
+#define lcd_rs pin_E2     // pino rs (Register Select) do LCD -> conectado ao RE2
+//#define lcd_rw pin_A4   // pino rw (Read/Write) do LCD (comentado, prov. aterrado na placa)
+#define lcd_d4 pin_d4     // pino de dados d4 do LCD -> conectado ao RD4
+#define lcd_d5 pin_d5     // pino de dados d5 do LCD -> conectado ao RD5
+#define lcd_d6 pin_d6     // pino de dados d6 do LCD -> conectado ao RD6
+#define lcd_d7 pin_d7     // pino de dados d7 do LCD -> conectado ao RD7
+#endif
+
+#include "mod_lcd.c"
+
+
+void main()
+{
+   setup_adc_ports(AN0);
+   setup_adc(ADC_CLOCK_DIV_2);
+
+   while(TRUE)
+   {
+      //TODO: User Code
+   }
+
+}

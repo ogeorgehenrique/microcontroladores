@@ -1,0 +1,22 @@
+[PROJECT]
+Target=pwmFade.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=pwmFade.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\6. PWM fade_respiração\pwmFade]
+Type=4
+[mru-list]
+1=pwmFade.c
+[Opened Files]
+1=pwmFade.c
+2=
+[pwmFade.c]
+Type=4
+[Units]
+Count=1
+1=pwmFade (main)

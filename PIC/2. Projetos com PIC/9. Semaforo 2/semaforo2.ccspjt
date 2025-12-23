@@ -1,0 +1,23 @@
+[PROJECT]
+Target=semaforo2.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=semaforo2.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\semaforo2\semaforo2]
+Type=4
+[mru-list]
+1=semaforo2.c
+[Opened Files]
+1=semaforo2.c
+2=
+3=
+[semaforo2.c]
+Type=4
+[Units]
+Count=1
+1=semaforo2 (main)

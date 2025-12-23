@@ -1,0 +1,20 @@
+*** Error 100 "serial.c" Line 39(5,12): USE parameter value is out of range   ""
+*** Error 48 "serial.c" Line 40(5,9): Expecting a (
+*** Error 43 "serial.c" Line 40(10,14): Expecting a declaration
+*** Error 43 "serial.c" Line 40(14,15): Expecting a declaration
+*** Error 48 "serial.c" Line 41(5,11): Expecting a (
+*** Error 48 "serial.c" Line 41(12,13): Expecting a (
+*** Error 48 "serial.c" Line 42(5,9): Expecting a (
+*** Error 43 "serial.c" Line 42(10,17): Expecting a declaration
+*** Error 43 "serial.c" Line 42(16,17): Expecting a declaration
+*** Error 48 "serial.c" Line 43(5,8): Expecting a (
+*** Error 43 "serial.c" Line 43(9,16): Expecting a declaration
+*** Error 43 "serial.c" Line 43(15,16): Expecting a declaration
+*** Error 48 "serial.c" Line 44(5,9): Expecting a (
+*** Error 43 "serial.c" Line 44(10,11): Expecting a declaration
+*** Error 43 "serial.c" Line 45(1,2): Expecting a declaration
+*** Error 102 "serial.c" Line 80(14,17): Expect comma
+*** Error 102 "serial.c" Line 86(14,17): Expect comma
+*** Error 102 "serial.c" Line 90(14,18): Expect comma
+      18 Errors,  0 Warnings.
+Build Failed.

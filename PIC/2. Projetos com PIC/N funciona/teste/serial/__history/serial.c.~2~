@@ -1,0 +1,82 @@
+/*
+ * ==============================================================================
+ * PROJETO: Identificador de Caracteres via Serial (LCD + UART)
+ * PLACA ALVO: PICGenios (PIC16F877A)
+ *
+ * DESCRIÇÃO:
+ * 1. O PIC recebe um caractere via Serial (Virtual Terminal).
+ * 2. Analisa o valor ASCII desse caractere.
+ * 3. Mostra no LCD se é um NÚMERO ou uma LETRA.
+ *
+ * MAPA ASCII USADO:
+ * - Números (0-9): 48 a 57
+ * - Letras Maiúsculas (A-Z): 65 a 90
+ * - Letras Minúsculas (a-z): 97 a 122
+ * ==============================================================================
+ */
+
+#include <16F877A.h>
+
+// --- Configuração dos Fuses ---
+#FUSES NOWDT, HS, NOPUT, NOPROTECT, NODEBUG, NOBROWNOUT, NOLVP, NOCPD, NOWRT
+#use delay(clock=20000000)
+
+// --- Configuração da Serial (RS232) ---
+// Baud rate: 9600, 8 bits, Sem paridade.
+// RX: Pino C7 | TX: Pino C6
+#use rs232(baud=9600, parity=N, xmit=PIN_C6, rcv=PIN_C7, bits=8)
+
+// --- Configuração dos Pinos do LCD (Padrão PICGenios) ---
+// Definimos os pinos ANTES de incluir o driver <lcd.c>
+#define LCD_ENABLE_PIN PIN_E1
+#define LCD_RS_PIN     PIN_E2
+#define LCD_RW_PIN     PIN_E0
+#define LCD_DATA4      PIN_D4
+#define LCD_DATA5      PIN_D5
+#define LCD_DATA6      PIN_D6
+#define LCD_DATA7      PIN_D7
+
+#include <lcd.c> // Driver padrão do CCS para LCD
+
+void main() {
+    char dado; // Variável para armazenar o caractere recebido
+
+    // Inicializa o LCD
+    lcd_init();
+
+    // Escreve a mensagem fixa na primeira linha
+    // \f limpa a tela
+    printf(lcd_putc, "\fIFMT");
+
+    while(true) {
+        
+        // Verifica se chegou algum dado na porta serial
+        // kbhit() retorna VERDADEIRO (1) se houver dados no buffer
+        if(kbhit()) {
+            
+            // Lê o caractere da serial
+            dado = getc(); 
+            
+            // Move o cursor para o início da segunda linha
+            lcd_gotoxy(1, 2);
+
+            // --- Lógica de Verificação (Tabela ASCII) ---
+
+            // 1. Verifica se é NÚMERO (ASCII 48 a 57)
+            if (dado >= 48 && dado <= 57) {
+                // Imprime "Numero=X"
+                // Os espaços no final servem para limpar caracteres antigos
+                printf(lcd_putc, "Numero=%c       ", dado);
+            }
+            // 2. Verifica se é LETRA MAIÚSCULA (65 a 90) OU MINÚSCULA (97 a 122)
+            else if ((dado >= 65 && dado <= 90) || (dado >= 97 && dado <= 122)) {
+                // Imprime "Letra = c"
+                printf(lcd_putc, "Letra = %c      ", dado);
+            }
+            // 3. (Opcional) Caso não seja nem número nem letra
+            else {
+                printf(lcd_putc, "Outro = %c      ", dado);
+            }
+        }
+    }
+}

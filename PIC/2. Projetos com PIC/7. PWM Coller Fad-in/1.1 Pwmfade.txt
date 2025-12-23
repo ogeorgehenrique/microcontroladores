@@ -1,0 +1,13 @@
+ * PROJETO: Efeito de "Fade" ou "Respiração" (Breathing) com Coller
+ * PLACA ALVO: PICGenios
+ * MICROCONTROLADOR: PIC16F877A
+ *
+ * DESCRIÇÃO:
+ * Este código cria um efeito de "fade" (aumento e diminuição suave
+ * de velocidade do coller/ventoinha) na PICGenios.
+ * a velocidade é controlado por PWM (Modulação por Largura de Pulso)
+ * implementado via SOFTWARE, usando delays manuais.
+ *
+ * 1. (Fade In): O brilho aumenta de 0% para 100% em 5 segundos.
+ * 2. (Fade Out): O brilho diminui de 100% para 0% em 5 segundos.
+ * 3. O ciclo se repete.

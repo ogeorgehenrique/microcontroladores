@@ -1,0 +1,159 @@
+#include <16F628A.h>
+
+// --- CONFIGURAÇÕES DO MICROCONTROLADOR ---
+#FUSES NOWDT, NOBROWT, NOLVP, INTRC_IO 
+#use delay(crystal=4000000)
+
+// =======================================================================
+// --- DEFINIÇÕES DE PINOS (MAPEAMENTO PARA A PLACA MCLAB1) ---
+// =======================================================================
+
+// LEDs do Semáforo de Carros (LEDs L1, L2, L5 da placa)
+#define CAR_GREEN_LED   PIN_A0
+#define CAR_YELLOW_LED  PIN_A1
+#define CAR_RED_LED     PIN_A4
+
+// LEDs do Semáforo de Pedestres (LEDs L7, L8 da placa)
+#define PED_GREEN_LED   PIN_A6
+#define PED_RED_LED     PIN_A7
+
+// Botão de entrada (Botão B4 da placa)
+#define BUTTON          PIN_A3
+
+// Pinos de controle dos Displays na McLab1
+#define DISPLAY_DEZENA_CTRL  PIN_A2 // Controle do display 1 (Dezena)
+#define DISPLAY_UNIDADE_CTRL PIN_A3 // Controle do display 2 (Unidade)
+
+// --- CONSTANTES DO PROGRAMA ---
+#define MIN_WAIT_TIME 20 // Tempo mínimo de 20 segundos entre acionamentos
+
+// --- DADOS PARA O DISPLAY DE 7 SEGMENTOS (Cátodo Comum) ---
+// McLab1 usa displays de Cátodo Comum. Padrão: g-f-e-d-c-b-a
+byte const display_map[10] = {
+   0b00111111, // 0
+   0b00000110, // 1
+   0b01011011, // 2
+   0b01001111, // 3
+   0b01100110, // 4
+   0b01101101, // 5
+   0b01111101, // 6
+   0b00000111, // 7
+   0b01111111, // 8
+   0b01101111  // 9
+};
+
+// --- PROTÓTIPOS DAS FUNÇÕES ---
+void display_off();
+void display_number(byte number);
+void run_pedestrian_crossing();
+
+// --- FUNÇÃO PRINCIPAL ---
+void main() {
+   // Configuração inicial do microcontrolador
+   setup_comparator(NC_NC_NC_NC); 
+   setup_vref(FALSE);
+   set_tris_b(0x00); // PORTB é sempre saída (para os segmentos)
+
+   unsigned int16 time_since_last_press = MIN_WAIT_TIME;
+
+   while (TRUE) {
+      
+      // --- ESTADO 1: PADRÃO (VERDE CARROS, VERMELHO PEDESTRES) ---
+      // Configura RA3 como ENTRADA para ler o botão B4
+      set_tris_a(0b00101000); // Apenas RA3 e RA5 são entradas
+      
+      output_high(CAR_GREEN_LED);
+      output_low(CAR_YELLOW_LED);
+      output_low(CAR_RED_LED);
+      output_low(PED_GREEN_LED);
+      output_high(PED_RED_LED);
+      display_off();
+
+      // Loop de espera do botão.
+      while (TRUE) {
+         if (input(BUTTON) == 0) {
+            if (time_since_last_press < MIN_WAIT_TIME) {
+               delay_ms((MIN_WAIT_TIME - time_since_last_press) * 1000);
+            }
+            break; 
+         }
+         delay_ms(1000);
+         if (time_since_last_press <= MIN_WAIT_TIME) {
+            time_since_last_press++;
+         }
+      }
+
+      // --- TRANSIÇÃO PARA MODO DE TRAVESSIA ---
+      // Reconfigura RA3 como SAÍDA para controlar o display
+      set_tris_a(0b00100000); // Apenas RA5 como entrada
+      
+      // --- ESTADO 2: SINAL AMARELO PARA CARROS ---
+      output_low(CAR_GREEN_LED);
+      output_high(CAR_YELLOW_LED);
+      delay_ms(3000);
+
+      // --- ESTADO 3: SINAL VERMELHO PARA CARROS (ESPERA) ---
+      output_low(CAR_YELLOW_LED);
+      output_high(CAR_RED_LED);
+      delay_ms(2000);
+
+      // --- ESTADO 4: TRAVESSIA DE PEDESTRES (COM CONTAGEM) ---
+      run_pedestrian_crossing();
+
+      // --- ESTADO 5: FIM DA TRAVESSIA ---
+      output_low(PED_GREEN_LED);
+      output_high(PED_RED_LED);
+      delay_ms(1000);
+
+      time_since_last_press = 0;
+   }
+}
+
+// --- IMPLEMENTAÇÃO DAS FUNÇÕES AUXILIARES ---
+
+void display_off() {
+   output_low(DISPLAY_DEZENA_CTRL);
+   output_low(DISPLAY_UNIDADE_CTRL);
+   output_b(0x00);
+}
+
+// FUNÇÃO ATUALIZADA PARA A MCLAB1
+void display_number(byte number) {
+   byte dezena = number / 10;
+   byte unidade = number % 10;
+
+   // Loop de multiplexação que dura aprox. 1 segundo
+   for (int i = 0; i < 100; i++) {
+      // Acende o display da DEZENA
+      output_high(DISPLAY_DEZENA_CTRL); // Liga o transistor do display da dezena
+      output_b(display_map[dezena]);    // Manda o padrão dos segmentos
+      delay_ms(5);
+      output_low(DISPLAY_DEZENA_CTRL);  // Apaga para evitar "ghosting"
+
+      // Acende o display da UNIDADE
+      output_high(DISPLAY_UNIDADE_CTRL); // Liga o transistor do display da unidade
+      output_b(display_map[unidade]);     // Manda o padrão dos segmentos
+      delay_ms(5);
+      output_low(DISPLAY_UNIDADE_CTRL);   // Apaga para evitar "ghosting"
+   }
+}
+
+// FUNÇÃO ATUALIZADA PARA USAR display_number
+void run_pedestrian_crossing() {
+   output_high(PED_GREEN_LED);
+   output_low(PED_RED_LED);
+
+   for (int count = 15; count >= 0; count--) {
+      // Pisca o LED verde nos últimos 5 segundos
+      if (count <= 5) {
+         output_low(PED_GREEN_LED);
+         display_number(count);
+         // O LED ficará aceso na próxima iteração do if principal
+      } else {
+         output_high(PED_GREEN_LED);
+         display_number(count);
+      }
+      // Reacende para o próximo ciclo de pisca
+      if(count <= 5) output_high(PED_GREEN_LED);
+   }
+}

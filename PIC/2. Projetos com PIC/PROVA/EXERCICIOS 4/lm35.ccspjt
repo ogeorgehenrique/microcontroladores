@@ -1,0 +1,24 @@
+[PROJECT]
+Target=lm35.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+CCSVersion=5.015
+[Target Data]
+FileList=lm35.c
+[Directories]
+Include=C:\Program Files (x86)\PICC\Devices\;C:\Program Files (x86)\PICC\Drivers\
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PROVA\EXERCICIOS 4\lm35]
+Type=4
+[mru-list]
+1=lm35.c
+[Opened Files]
+1=lm35.c
+2=..\..\4. LCD AD\lcd_ad.c
+3=
+4=
+[lm35.c]
+Type=4
+[Units]
+Count=1
+1=lm35 (main)

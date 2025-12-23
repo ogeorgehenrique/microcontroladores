@@ -1,0 +1,51 @@
+004-005 @READ_PROGRAM_MEMORY8.P1
+015     CCP_1
+015     CCP_1_LOW
+016     CCP_1_HIGH
+01F.6   C1OUT
+01F.7   C2OUT
+021     main.@SCRATCH1
+022     @delay_ms1.P1
+077     @SCRATCH
+078     @SCRATCH
+078     _RETURN_
+079     @SCRATCH
+07A     @SCRATCH
+09B-09C @READ_PROGRAM_MEMORY8.P1
+
+ROM Allocation:
+000004  @delay_ms1
+000018  @cinit1
+000018  main
+00001D  @cinit2
+
+Project Directory:
+    C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Botao\
+
+Project Files:
+    botao.c                                                 [01-set-25 12:19  CRC=F1AF6BF6]
+    ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F628A.h [12-nov-13 14:34  CRC=44569924]
+
+Source signature=7A5C9E3E
+
+Units:
+    botao (main)
+
+Compiler Settings:
+    Processor:      PIC16F628A
+    Pointer Size:   16
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    XREF file:   botao.xsym
+    Errors:      botao.err
+    Ext Symbols: botao.esym
+    INHX8:       botao.hex
+    Symbols:     botao.sym
+    List:        botao.lst
+    Debug/COFF:  botao.cof
+    Project:     botao.ccspjt
+    Call Tree:   botao.tre
+    Statistics:  botao.STA

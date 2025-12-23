@@ -1,0 +1,324 @@
+CCS PCM C Compiler, Version 5.015, 5967               16-nov-25 17:10
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Nova pasta\pwm.lst
+
+               ROM used:   173 words (2%)
+                           Largest free fragment is 2048
+               RAM used:   8 (2%) at main() level
+                           9 (2%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   01A
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Dimmer de LED controlado por Sensor Analógico 
+....................  * PLACA ALVO: PICGenios 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este código lê o valor de um sensor analógico (conectado ao pino AN0) 
+....................  * e usa esse valor para controlar o brilho de um LED em tempo real. 
+....................  * 
+....................  * Ele usa os módulos de HARDWARE do PIC para ser muito eficiente: 
+....................  * 1. Módulo ADC (Conversor A/D): Para ler o sensor. 
+....................  * 2. Módulo CCP1 (Hardware PWM): Para controlar o brilho do LED. 
+....................  * 
+....................  * NA PLACA PICGENIOS: 
+....................  * - Entrada (AN0 / RA0): Sensor de Temperatura LM35. 
+....................  * - Saída (CCP1 / RC2): LED RL1. 
+....................  * 
+....................  * RESULTADO: O brilho do LED RL1 mudará de acordo com a temperatura 
+....................  * lida pelo sensor LM35. 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+....................  
+.................... // Define a resolução do ADC para 10 bits. 
+.................... // Isso significa que a leitura do sensor (0-5V) será um número de 0 a 1023. 
+.................... #device adc=10 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES HS         // Oscilador High Speed (para o cristal de 20MHz) 
+.................... #FUSES NOPUT      // Desabilita o Power Up Timer 
+.................... #FUSES NOPROTECT  // Código não protegido contra leitura 
+.................... #FUSES NODEBUG    // Modo Debug desligado 
+.................... #FUSES NOBROWNOUT // Desabilita reset por queda de tensão 
+.................... #FUSES NOLVP      // DesabilTA baixa tensão (libera pino RB3) 
+.................... #FUSES NOCPD      // Proteção de dados da EEPROM desligada 
+.................... #FUSES NOWRT      // Memória de programa não protegida contra escrita 
+.................... #FUSES RESERVED   // Bits de fuse reservados 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz 
+.................... #use delay(clock=20000000) 
+0004:  MOVLW  23
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  BCF    0A.3
+0018:  BCF    0A.4
+0019:  GOTO   0AB (RETURN)
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+001A:  MOVF   03,W
+001B:  ANDLW  1F
+001C:  MOVWF  03
+001D:  MOVLW  FF
+001E:  MOVWF  20
+001F:  BSF    03.5
+0020:  BSF    1F.0
+0021:  BSF    1F.1
+0022:  BSF    1F.2
+0023:  BCF    1F.3
+0024:  MOVLW  07
+0025:  MOVWF  1C
+0026:  BCF    03.7
+0027:  BCF    03.5
+0028:  CLRF   22
+0029:  CLRF   21
+.................... { 
+....................     // Variável para armazenar o valor lido pelo ADC (0-1023) 
+....................     unsigned int16 ton=0; // O nome 'ton' é usado aqui para representar o "Duty Cycle" 
+....................                           // ou "Tempo Ligado" do PWM. 
+....................  
+....................     // --- Configuração dos Periféricos --- 
+....................      
+....................     // 1. Configuração do Conversor Analógico-Digital (ADC) 
+....................     // Define AN0 (RA0), AN1 (RA1) e AN3 (RA3) como entradas analógicas. 
+....................     setup_adc_ports(AN0_AN1_AN3); 
+002A:  BSF    03.5
+002B:  BCF    1F.0
+002C:  BCF    1F.1
+002D:  BSF    1F.2
+002E:  BCF    1F.3
+....................     // Define a velocidade do clock do ADC. 
+....................     setup_adc(ADC_CLOCK_DIV_16); 
+002F:  BSF    1F.6
+0030:  BCF    03.5
+0031:  BSF    1F.6
+0032:  BCF    1F.7
+0033:  BSF    03.5
+0034:  BSF    1F.7
+0035:  BCF    03.5
+0036:  BSF    1F.0
+....................      
+....................     // 2. Desabilita periféricos não utilizados 
+....................     setup_psp(PSP_DISABLED); 
+0037:  BSF    03.5
+0038:  BCF    09.4
+....................     setup_spi(SPI_SS_DISABLED); 
+0039:  BCF    03.5
+003A:  BCF    14.5
+003B:  BCF    20.5
+003C:  MOVF   20,W
+003D:  BSF    03.5
+003E:  MOVWF  07
+003F:  BCF    03.5
+0040:  BSF    20.4
+0041:  MOVF   20,W
+0042:  BSF    03.5
+0043:  MOVWF  07
+0044:  BCF    03.5
+0045:  BCF    20.3
+0046:  MOVF   20,W
+0047:  BSF    03.5
+0048:  MOVWF  07
+0049:  MOVLW  01
+004A:  BCF    03.5
+004B:  MOVWF  14
+004C:  MOVLW  00
+004D:  BSF    03.5
+004E:  MOVWF  14
+....................     setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1); 
+004F:  MOVF   01,W
+0050:  ANDLW  C7
+0051:  IORLW  08
+0052:  MOVWF  01
+....................     setup_timer_1(T1_DISABLED); 
+0053:  BCF    03.5
+0054:  CLRF   10
+....................      
+....................     // 3. Configuração do Hardware PWM (Módulo CCP1) 
+....................      
+....................     // ATENÇÃO: O Hardware PWM DEPENDE do Timer 2 para funcionar. 
+....................     // Esta linha configura o Timer 2, que define a FREQUÊNCIA do PWM. 
+....................     // T2_DIV_BY_16: Prescaler do Timer 2 
+....................     // 255: Período (PR2) - Valor máximo do timer 
+....................     // 1: Postscaler 
+....................     setup_timer_2(T2_DIV_BY_16,255,1); 
+0055:  MOVLW  00
+0056:  MOVWF  78
+0057:  IORLW  06
+0058:  MOVWF  12
+0059:  MOVLW  FF
+005A:  BSF    03.5
+005B:  MOVWF  12
+....................      
+....................     // LIGA o módulo CCP1 (no pino RC2) no modo PWM. 
+....................     // A partir deste momento, o hardware do PIC controla o pino RC2 
+....................     // para gerar os pulsos de brilho automaticamente. 
+....................     setup_ccp1(CCP_PWM); 
+005C:  BCF    03.5
+005D:  BCF    20.2
+005E:  MOVF   20,W
+005F:  BSF    03.5
+0060:  MOVWF  07
+0061:  BCF    03.5
+0062:  BCF    07.2
+0063:  MOVLW  0C
+0064:  MOVWF  17
+....................      
+....................     // Define um brilho inicial para o PWM. 
+....................     // O valor do "duty cycle" (brilho) vai de 0 até um máximo de 1023 
+....................     // (nesta configuração de timer). 512 é aprox. 50% de brilho. 
+....................     set_pwm1_duty(512); 
+0065:  MOVLW  80
+0066:  MOVWF  15
+0067:  MOVF   17,W
+0068:  ANDLW  CF
+0069:  MOVWF  17
+....................      
+....................     // 4. Desabilita periféricos restantes 
+....................     setup_comparator(NC_NC_NC_NC); // Desliga comparadores 
+006A:  MOVLW  07
+006B:  BSF    03.5
+006C:  MOVWF  1C
+006D:  MOVF   05,W
+006E:  MOVWF  05
+006F:  MOVLW  10
+0070:  MOVWF  77
+0071:  DECFSZ 77,F
+0072:  GOTO   071
+0073:  NOP
+0074:  MOVF   1C,W
+0075:  BCF    03.5
+0076:  BCF    0D.6
+....................     setup_vref(FALSE); // Desliga referência de tensão interna 
+0077:  BSF    03.5
+0078:  CLRF   1D
+....................  
+....................     // 5. Configuração inicial do ADC 
+....................     // Define o Canal 0 (AN0 / RA0) como o canal padrão para leitura 
+....................     set_adc_channel(0); 
+0079:  MOVLW  00
+007A:  MOVWF  78
+007B:  BCF    03.5
+007C:  MOVF   1F,W
+007D:  ANDLW  C7
+007E:  IORWF  78,W
+007F:  MOVWF  1F
+....................     delay_us(50); // Pequena pausa para o canal do ADC estabilizar 
+0080:  MOVLW  52
+0081:  MOVWF  77
+0082:  DECFSZ 77,F
+0083:  GOTO   082
+0084:  GOTO   085
+0085:  NOP
+....................  
+....................     // --- Loop Infinito (Lógica Principal) --- 
+....................     // Este loop é muito eficiente. Ele apenas lê o sensor e 
+....................     // atualiza o hardware PWM. Todo o "piscar" do LED é feito 
+....................     // pelo hardware, liberando o processador. 
+....................     while(true) 
+....................     { 
+....................         // 1. Lê o valor do sensor 
+....................         // A função 'read_adc()' lê o canal que foi selecionado 
+....................         // anteriormente (Canal 0). 
+....................         // 'ton' receberá um valor entre 0 e 1023. 
+....................         ton = read_adc(); 
+0086:  BSF    1F.2
+0087:  BTFSC  1F.2
+0088:  GOTO   087
+0089:  BSF    03.5
+008A:  MOVF   1E,W
+008B:  BCF    03.5
+008C:  MOVWF  21
+008D:  MOVF   1E,W
+008E:  MOVWF  22
+....................         delay_us(50); // Pausa para a leitura do AD 
+008F:  MOVLW  52
+0090:  MOVWF  77
+0091:  DECFSZ 77,F
+0092:  GOTO   091
+0093:  GOTO   094
+0094:  NOP
+....................          
+....................         // 2. Atualiza o brilho do LED 
+....................         // 'set_pwm1_duty()' atualiza o "duty cycle" (brilho) do hardware PWM. 
+....................         // Se 'ton' for 300, o brilho será ~30%. 
+....................         // Se 'ton' for 900, o brilho será ~90%. 
+....................         set_pwm1_duty(ton); 
+0095:  MOVF   22,W
+0096:  MOVWF  79
+0097:  MOVF   21,W
+0098:  MOVWF  78
+0099:  RRF    79,F
+009A:  RRF    78,F
+009B:  RRF    79,F
+009C:  RRF    78,F
+009D:  RRF    79,F
+009E:  MOVF   78,W
+009F:  MOVWF  15
+00A0:  RRF    79,F
+00A1:  RRF    79,W
+00A2:  ANDLW  30
+00A3:  MOVWF  77
+00A4:  MOVF   17,W
+00A5:  ANDLW  CF
+00A6:  IORWF  77,W
+00A7:  MOVWF  17
+....................          
+....................         // 3. Espera 50ms antes de ler o sensor novamente. 
+....................         // Isso evita que o valor mude rápido demais e estabiliza a leitura. 
+....................         delay_ms(50); 
+00A8:  MOVLW  32
+00A9:  MOVWF  23
+00AA:  GOTO   004
+00AB:  GOTO   086
+....................          
+....................     } // Fim do while(true), o ciclo recomeça 
+.................... } 
+00AC:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

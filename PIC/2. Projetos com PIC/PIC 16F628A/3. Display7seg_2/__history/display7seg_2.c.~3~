@@ -1,0 +1,54 @@
+#include <16F628A.h>
+#FUSES NOWDT //No Watch Dog Timer
+#FUSES NOBROWNOUT //No brownout reset
+#FUSES NOLVP //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O#use delay(crystal=4000000)
+#define LED PIN_B4
+#define DELAY 10
+#define DELAY_LIGADO 5
+
+signed int8 flag=1;
+
+byte const unidade[11]={
+   0b11111110, //0
+   0b00111000, //1
+   0b11011101, //2
+   0b01111101, //3
+   0b00111011, //4
+   0b01110111, //5
+   0b11110111, //6
+   0b00111100, //7
+   0b11111111, //8
+   0b01111111 //9
+};
+
+byte const dezena[11]={
+   0b11101110, //0
+   0b00101000, //1
+   0b11001101, //2
+   0b01101101, //3
+   0b00101011, //4
+   0b01100111, //5
+   0b11100111, //6
+   0b00101100, //7
+   0b11101111, //8
+   0b01101111 //9
+};
+
+void main(){
+   unsigned int i=0,tempo,cont = 25;
+   while(true){
+      for(tempo=0;tempo<100;tempo++){
+         i = cont/10;
+         output_b(dezena[i]);
+         delay_ms(5);
+         i = cont%10;
+         output_b(unidade[i]);
+         delay_ms(5);
+      }
+      cont=cont+flag;
+      if(cont>=60 || cont<=25){
+         flag=flag*(-1);
+      }
+   }
+}
+

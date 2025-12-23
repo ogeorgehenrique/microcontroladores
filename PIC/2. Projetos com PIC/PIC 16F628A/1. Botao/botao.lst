@@ -1,0 +1,159 @@
+CCS PCM C Compiler, Version 5.015, 5967               02-nov-25 12:43
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\Botao\botao.lst
+
+               ROM used:   84 words (4%)
+                           Largest free fragment is 1964
+               RAM used:   6 (3%) at main() level
+                           7 (3%) worst case
+               Stack used: 1 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   018
+0003:  NOP
+.................... #include <16F628A.h> 
+.................... //////////// Standard Header file for the PIC16F628A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F628A 
+....................  
+.................... #list 
+....................  
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES NOBROWNOUT               //No brownout reset 
+.................... #FUSES NOLVP                    //No low voltage prgming, B3(PIC16) or B5(PIC18) used for I/O 
+....................  
+.................... #use delay(crystal=20000000) 
+0004:  MOVLW  22
+0005:  MOVWF  04
+0006:  BCF    03.7
+0007:  MOVF   00,W
+0008:  BTFSC  03.2
+0009:  GOTO   017
+000A:  MOVLW  06
+000B:  MOVWF  78
+000C:  CLRF   77
+000D:  DECFSZ 77,F
+000E:  GOTO   00D
+000F:  DECFSZ 78,F
+0010:  GOTO   00C
+0011:  MOVLW  7B
+0012:  MOVWF  77
+0013:  DECFSZ 77,F
+0014:  GOTO   013
+0015:  DECFSZ 00,F
+0016:  GOTO   00A
+0017:  GOTO   04C (RETURN)
+....................  
+.................... #define LED PIN_None 
+.................... #define DELAY 1000 
+....................  
+....................  
+....................  
+.................... void main() 
+0018:  MOVF   03,W
+0019:  ANDLW  1F
+001A:  MOVWF  03
+001B:  MOVLW  07
+001C:  MOVWF  1F
+001D:  BCF    03.7
+.................... { 
+....................  
+....................    //Example blinking LED program 
+....................    while(true) 
+....................    { 
+....................      //Ao manter o botâo precionado o led irá acender, se soltar o botao ele apaga 
+....................       if(input(pin_a1)==0){ 
+001E:  BSF    03.5
+001F:  BSF    05.1
+0020:  BCF    03.5
+0021:  BTFSC  05.1
+0022:  GOTO   027
+....................          output_high(pin_a0); 
+0023:  BSF    03.5
+0024:  BCF    05.0
+0025:  BCF    03.5
+0026:  BSF    05.0
+....................       } 
+....................       if(input(pin_a1)==1){ 
+0027:  BSF    03.5
+0028:  BSF    05.1
+0029:  BCF    03.5
+002A:  BTFSS  05.1
+002B:  GOTO   030
+....................          output_low(pin_a0); 
+002C:  BSF    03.5
+002D:  BCF    05.0
+002E:  BCF    03.5
+002F:  BCF    05.0
+....................       } 
+....................        
+....................       //mesma logica, mas com menos codigo   
+....................       if(input(pin_a2)==0){ 
+0030:  BSF    03.5
+0031:  BSF    05.2
+0032:  BCF    03.5
+0033:  BTFSC  05.2
+0034:  GOTO   03A
+....................          output_high(pin_a0); 
+0035:  BSF    03.5
+0036:  BCF    05.0
+0037:  BCF    03.5
+0038:  BSF    05.0
+....................       }else{ 
+0039:  GOTO   03E
+....................          output_low(pin_a0); 
+003A:  BSF    03.5
+003B:  BCF    05.0
+003C:  BCF    03.5
+003D:  BCF    05.0
+....................       } 
+....................      
+....................        
+....................       //Ao precionar o botão o LED irá ficar asceso por 1000ms 
+....................       if(input(pin_a3)==0){ 
+003E:  BSF    03.5
+003F:  BSF    05.3
+0040:  BCF    03.5
+0041:  BTFSC  05.3
+0042:  GOTO   052
+....................          output_high(pin_a0); 
+0043:  BSF    03.5
+0044:  BCF    05.0
+0045:  BCF    03.5
+0046:  BSF    05.0
+....................          delay_ms(1000); 
+0047:  MOVLW  04
+0048:  MOVWF  21
+0049:  MOVLW  FA
+004A:  MOVWF  22
+004B:  GOTO   004
+004C:  DECFSZ 21,F
+004D:  GOTO   049
+....................          output_low(pin_a0); 
+004E:  BSF    03.5
+004F:  BCF    05.0
+0050:  BCF    03.5
+0051:  BCF    05.0
+....................       } 
+0052:  GOTO   01E
+....................        
+....................        
+....................    } 
+....................  
+.................... } 
+0053:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F22   NOWDT PUT HS MCLR NOBROWNOUT NOLVP NOCPD NOPROTECT

@@ -1,0 +1,4 @@
+Feito para rodar no PicSimLab com o PIC 16f628a na Boad: McLab 01
+
+
+*esse código faz com que o led da placa acenda ao manter pressionado uns dos botões: A1, A2 ou A3, basicamente o código testa varias formas de se usar um botão.

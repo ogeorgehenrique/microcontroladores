@@ -1,0 +1,19 @@
+[PROJECT]
+Target=C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\serial.hex
+Processor_Text=PIC16F877A
+CCSVerions=5.015
+Compiler=PCM
+[Target Data]
+FileList=serial.c
+[Directories]
+Include=
+[C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\serial]
+Type=4
+[mru-list]
+1=serial.c
+[Units]
+Count=1
+1=serial (main)
+[Opened Files]
+1=serial.c
+2=

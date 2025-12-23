@@ -1,0 +1,4 @@
+Feito para rodar no PicSimLab com o PIC 16F877A na Boad: PicGenios
+
+
+Esse código inicializa o LCD e exibe varias frases no LCD

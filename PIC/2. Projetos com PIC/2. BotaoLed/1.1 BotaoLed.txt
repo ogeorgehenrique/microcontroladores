@@ -1,0 +1,4 @@
+Feito para rodar no PicSimLab com o PIC 16F877A na Boad: PicGenios
+
+
+*este código faz como que ao pressionar o botão B0 os led (B1 ate B7) apaguem e depois acender apenas o B1 e B6

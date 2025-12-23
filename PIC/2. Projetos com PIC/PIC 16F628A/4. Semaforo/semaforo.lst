@@ -1,0 +1,369 @@
+CCS PCM C Compiler, Version 5.015, 5967               15-nov-25 16:48
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\semaforo\semaforo.lst
+
+               ROM used:   161 words (8%)
+                           Largest free fragment is 1887
+               RAM used:   7 (3%) at main() level
+                           12 (5%) worst case
+               Stack used: 2 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   082
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Cronômetro Regressivo (20 a 0) com Acionamento por Botão 
+....................  * PLACA ALVO: McLab 1 (PICSIMLab) 
+....................  * MICROCONTROLADOR: PIC16F628A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este código implementa um cronômetro de contagem regressiva. 
+....................  * O programa começa em um estado de "espera". 
+....................  * Ao pressionar o botão em PIN_A1 (B2 na McLab 1), um LED em PIN_A0 (L1) 
+....................  * pisca rapidamente e a contagem regressiva é iniciada nos displays. 
+....................  * A contagem começa em "20" e desce até "00". 
+....................  * Cada número muda a cada 0.2 segundos (200ms). 
+....................  * Após chegar ao "00", o display apaga e o programa volta ao 
+....................  * estado de "espera", aguardando um novo acionamento do botão. 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+....................  
+.................... #include <16F628A.h> // Biblioteca padrão do PIC16F628A 
+.................... //////////// Standard Header file for the PIC16F628A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F628A 
+0004:  BCF    0A.0
+0005:  BCF    0A.1
+0006:  BCF    0A.2
+0007:  ADDWF  02,F
+0008:  RETLW  FE
+0009:  RETLW  38
+000A:  RETLW  DD
+000B:  RETLW  7D
+000C:  RETLW  3B
+000D:  RETLW  77
+000E:  RETLW  F7
+000F:  RETLW  3C
+0010:  RETLW  FF
+0011:  RETLW  7F
+0012:  RETLW  00
+0013:  BCF    0A.0
+0014:  BCF    0A.1
+0015:  BCF    0A.2
+0016:  ADDWF  02,F
+0017:  RETLW  EE
+0018:  RETLW  28
+0019:  RETLW  CD
+001A:  RETLW  6D
+001B:  RETLW  2B
+001C:  RETLW  67
+001D:  RETLW  E7
+001E:  RETLW  2C
+001F:  RETLW  EF
+0020:  RETLW  6F
+0021:  RETLW  00
+*
+0036:  MOVF   25,W
+0037:  CLRF   78
+0038:  SUBWF  24,W
+0039:  BTFSC  03.0
+003A:  GOTO   03E
+003B:  MOVF   24,W
+003C:  MOVWF  77
+003D:  GOTO   04A
+003E:  CLRF   77
+003F:  MOVLW  08
+0040:  MOVWF  26
+0041:  RLF    24,F
+0042:  RLF    77,F
+0043:  MOVF   25,W
+0044:  SUBWF  77,W
+0045:  BTFSC  03.0
+0046:  MOVWF  77
+0047:  RLF    78,F
+0048:  DECFSZ 26,F
+0049:  GOTO   041
+004A:  RETURN
+....................  
+.................... #list 
+....................  
+....................  
+.................... // --- Configurações do Microcontrolador (FUSES) --- 
+.................... #FUSES NOWDT         // Desabilita o Watch Dog Timer 
+.................... #FUSES NOBROWNOUT    // Desabilita o Brownout Reset 
+.................... #FUSES NOLVP         // Desabilita o Low Voltage Programming 
+....................  
+.................... // --- Configuração do Clock (Velocidade) --- 
+.................... #use delay(crystal=20000000) // Informa ao compilador que estamos usando um Cristal de 20MHz 
+*
+0022:  MOVLW  24
+0023:  MOVWF  04
+0024:  BCF    03.7
+0025:  MOVF   00,W
+0026:  BTFSC  03.2
+0027:  GOTO   035
+0028:  MOVLW  06
+0029:  MOVWF  78
+002A:  CLRF   77
+002B:  DECFSZ 77,F
+002C:  GOTO   02B
+002D:  DECFSZ 78,F
+002E:  GOTO   02A
+002F:  MOVLW  7B
+0030:  MOVWF  77
+0031:  DECFSZ 77,F
+0032:  GOTO   031
+0033:  DECFSZ 00,F
+0034:  GOTO   028
+0035:  RETURN
+....................                             // para que os delays (delay_ms) sejam calculados corretamente. 
+....................  
+.................... #define DELAY 1000 // Constante definida mas não utilizada neste código. 
+....................  
+.................... signed int8 flag = 1; // Variável global. É usada na lógica de subtração 
+....................                       // (cont = cont - flag) na função teste(). 
+....................  
+.................... // --- Mapas de Bits para os Displays de 7 Segmentos (para McLab 1) --- 
+.................... // Contêm os padrões de bits para ligar os segmentos corretos E 
+.................... // controlar qual display (dezena ou unidade) está aceso. 
+.................... byte const unidade[11] = { 
+....................     0b11111110, //0 
+....................     0b00111000, //1 
+....................     0b11011101, //2 
+....................     0b01111101, //3 
+....................     0b00111011, //4 
+....................     0b01110111, //5 
+....................     0b11110111, //6 
+....................     0b00111100, //7 
+....................     0b11111111, //8 
+....................     0b01111111  //9 
+.................... }; 
+....................  
+.................... byte const dezena[11] = { 
+....................     0b11101110, //0 
+....................     0b00101000, //1 
+....................     0b11001101, //2 
+....................     0b01101101, //3 
+....................     0b00101011, //4 
+....................     0b01100111, //5 
+....................     0b11100111, //6 
+....................     0b00101100, //7 
+....................     0b11101111, //8 
+....................     0b01101111  //9 
+.................... }; 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO: teste() 
+....................  * DESCRIÇÃO: Esta função é a "AÇÃO" do programa. 
+....................  * Ela é chamada pela 'main()' quando o botão é pressionado. 
+....................  * Sua responsabilidade é realizar a contagem regressiva de 20 até 0 
+....................  * nos displays de 7 segmentos. 
+....................  * ============================================================================== 
+....................  */ 
+.................... void teste() 
+*
+004B:  CLRF   21
+004C:  MOVLW  14
+004D:  MOVWF  23
+.................... { 
+....................     // 1. Inicia as variáveis locais da contagem 
+....................     unsigned int i = 0, tempo; 
+....................     unsigned int cont = 20; // O contador 'cont' é iniciado em 20. 
+....................  
+....................     // 2. Entra em um loop próprio, que só será interrompido pelo 'break;' 
+....................     while (true) 
+....................     { 
+....................  
+....................         // 3. Loop de MULTIPLEXAÇÃO (Display) 
+....................         // Este loop 'for' roda 100 vezes. 
+....................         // Cálculo do tempo: 100 ciclos * (1ms + 1ms) = 200 milissegundos (ou 0.2 segundos) 
+....................         // O resultado é que cada número (20, 19, 18...) fica 
+....................         // visível no display por 0.2 segundos. 
+....................         for (tempo = 0; tempo < 100; tempo++) 
+004E:  CLRF   22
+004F:  MOVF   22,W
+0050:  SUBLW  63
+0051:  BTFSS  03.0
+0052:  GOTO   079
+....................         { 
+....................             // Acende o display da DEZENA 
+....................             i = cont / 10;        // Pega a dezena (ex: 19 / 10 = 1) 
+0053:  MOVF   23,W
+0054:  MOVWF  24
+0055:  MOVLW  0A
+0056:  MOVWF  25
+0057:  CALL   036
+0058:  MOVF   78,W
+0059:  MOVWF  21
+....................             output_b(dezena[i]);  // Envia o padrão do número para o PORTB 
+005A:  MOVF   21,W
+005B:  CALL   013
+005C:  MOVWF  24
+005D:  BSF    03.5
+005E:  CLRF   06
+005F:  BCF    03.5
+0060:  MOVF   24,W
+0061:  MOVWF  06
+....................             delay_ms(1);          // 4. Delay muito curto (1ms) 
+0062:  MOVLW  01
+0063:  MOVWF  24
+0064:  CALL   022
+....................  
+....................             // Acende o display da UNIDADE 
+....................             i = cont % 10;        // Pega a unidade (ex: 19 % 10 = 9) 
+0065:  MOVF   23,W
+0066:  MOVWF  24
+0067:  MOVLW  0A
+0068:  MOVWF  25
+0069:  CALL   036
+006A:  MOVF   77,W
+006B:  MOVWF  21
+....................             output_b(unidade[i]); // Envia o padrão do número para o PORTB 
+006C:  MOVF   21,W
+006D:  CALL   004
+006E:  MOVWF  24
+006F:  BSF    03.5
+0070:  CLRF   06
+0071:  BCF    03.5
+0072:  MOVF   24,W
+0073:  MOVWF  06
+....................             delay_ms(1);          // 4. Delay muito curto (1ms) 
+0074:  MOVLW  01
+0075:  MOVWF  24
+0076:  CALL   022
+0077:  INCF   22,F
+0078:  GOTO   04F
+....................         } 
+....................         // --- Fim do loop do display --- 
+....................         // 5. Neste ponto, 0.2 segundos se passaram. 
+....................  
+....................         // 6. Lógica da Contagem Regressiva 
+....................         // Subtrai o valor de 'flag' (que é 1) do contador. 
+....................         // Isso é o mesmo que fazer 'cont = cont - 1' 
+....................         cont = cont - flag; 
+0079:  MOVF   20,W
+007A:  SUBWF  23,W
+007B:  MOVWF  23
+....................  
+....................         // 7. Condição de Parada 
+....................         // O programa verifica se o contador chegou a -1. 
+....................         // Isso acontece logo após o display mostrar "00" (quando cont=0). 
+....................         // No ciclo seguinte, 'cont' vira -1. 
+....................         if (cont == -1) 
+007C:  MOVF   23,W
+007D:  SUBLW  FF
+007E:  BTFSC  03.2
+....................         { 
+....................             // 8. "Quebra" o loop 'while(true)' e SAI da função 'teste()'. 
+....................             // Ao sair, o controle do programa volta para a função 'main()', 
+....................             // de onde ela foi chamada. 
+....................             break; 
+007F:  GOTO   081
+....................         } 
+0080:  GOTO   04E
+....................  
+....................         /* 9. A lógica antiga do "ping-pong" está COMENTADA. 
+....................               O compilador ignora tudo que está dentro de /* ... */ 
+....................         /* 
+....................         if(cont>=20 || cont<=0){ 
+....................             flag=flag*(-1); 
+....................         } 
+....................         */ 
+....................     } 
+0081:  GOTO   09F (RETURN)
+.................... } // Fim da função teste() 
+....................  
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO: main() 
+....................  * DESCRIÇÃO: Esta é a função principal, o "GATILHO" do programa. 
+....................  * É aqui que o microcontrolador começa a executar o código. 
+....................  * Ela fica em um loop infinito, apenas esperando que o botão 
+....................  * seja pressionado para então chamar a função 'teste()'. 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+0082:  MOVF   03,W
+0083:  ANDLW  1F
+0084:  MOVWF  03
+0085:  MOVLW  01
+0086:  MOVWF  20
+0087:  MOVLW  07
+0088:  MOVWF  1F
+0089:  BCF    03.7
+.................... { 
+....................     // Loop principal infinito 
+....................     while (true) 
+....................     { 
+....................         // 1. (Opcional) Apenas define o pino RA6 como alto. 
+....................         // Na McLab 1, este pino não está conectado a nada visível (LED/Display). 
+....................         output_high(pin_a6); 
+008A:  BSF    03.5
+008B:  BCF    05.6
+008C:  BCF    03.5
+008D:  BSF    05.6
+....................  
+....................         // 2. Verifica constantemente o estado do botão 
+....................         // A função input(pin_a1) lê o pino RA1 (Botão B2 na McLab 1). 
+....................         // Se o botão for pressionado, o pino vai para nível 0. 
+....................         if (input(pin_a1) == 0) 
+008E:  BSF    03.5
+008F:  BSF    05.1
+0090:  BCF    03.5
+0091:  BTFSC  05.1
+0092:  GOTO   09F
+....................         { 
+....................             // 3. Se o botão foi pressionado, o código entra aqui: 
+....................  
+....................             // 4. Acende o LED L1 (conectado ao pino RA0) 
+....................             output_high(pin_a0); 
+0093:  BSF    03.5
+0094:  BCF    05.0
+0095:  BCF    03.5
+0096:  BSF    05.0
+....................  
+....................             // 5. Espera 100 milissegundos (para o piscar ser visível) 
+....................             delay_ms(100); 
+0097:  MOVLW  64
+0098:  MOVWF  24
+0099:  CALL   022
+....................  
+....................             // 6. Apaga o LED L1 
+....................             output_low(pin_a0); 
+009A:  BSF    03.5
+009B:  BCF    05.0
+009C:  BCF    03.5
+009D:  BCF    05.0
+....................  
+....................             // 7. CHAMA A FUNÇÃO "teste()" 
+....................             // O programa "pula" para a função teste() e executa 
+....................             // toda a contagem regressiva (de 20 a 0). 
+....................             teste(); 
+009E:  GOTO   04B
+....................  
+....................             // 8. Quando a função teste() termina (após o 'break;'), 
+....................             // o programa retorna para esta linha e continua o loop 'while(true)' 
+....................             // da 'main()', voltando ao estado de espera (passo 2). 
+....................         } 
+009F:  GOTO   08A
+....................     } // Fim do while(true) 
+.................... } // Fim da main() 
+00A0:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F22   NOWDT PUT HS MCLR NOBROWNOUT NOLVP NOCPD NOPROTECT

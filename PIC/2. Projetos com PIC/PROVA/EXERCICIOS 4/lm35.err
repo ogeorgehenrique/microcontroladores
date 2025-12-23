@@ -1,0 +1,4 @@
+>>> Warning 202 "lm35.c" Line 21(29,35): Variable never used:   valor2
+      Memory usage:   ROM=6%      RAM=1% - 7%
+      0 Errors,  1 Warnings.
+Build Successful.

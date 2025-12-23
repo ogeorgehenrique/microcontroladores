@@ -1,0 +1,207 @@
+#include <16F877A.h>
+#fuses XT, NOWDT, NOPROTECT, NOLVP
+#use delay(clock=4000000)
+
+// ---------- Mapeamento físico ----------
+
+#define CARRO_VERMELHO  PIN_B1
+#define CARRO_AMARELO   PIN_B2
+#define CARRO_VERDE     PIN_B3
+
+#define PED_VERMELHO    PIN_B5
+#define PED_VERDE       PIN_B6
+
+#define BOTAO           PIN_B0  // botão pedestre (ativo em 0)
+
+
+// Segmentos: RD0 a RD6 (a a g), RD7 = habilitador comum
+// Displays: dezena = RA4, unidade = RA5
+
+#define DISP_DEZENA     PIN_A4
+#define DISP_UNIDADE    PIN_A5
+#define SEGMENT_ENABLE  PIN_D7
+
+// ---------- Tabela de segmentos ----------
+
+
+const int8 segmentos[10][7] = {
+   {1,1,1,1,1,1,0}, // 0
+  
+   {0,1,1,0,0,0,0}, // 1
+ 
+   {1,1,0,1,1,0,1}, // 2
+   {1,1,1,1,0,0,1}, // 3
+  
+   {0,1,1,0,0,1,1}, // 4
+  
+   {1,0,1,1,0,1,1}, // 5
+  
+   {1,0,1,1,1,1,1}, // 6
+  
+   {1,1,1,0,0,0,0}, // 7
+  
+   {1,1,1,1,1,1,1}, // 8
+  
+   {1,1,1,1,0,1,1}  // 9
+   };
+
+// ---------- Funções auxiliares ----------
+
+void display_off() {
+   for (int i = 0; i < 7; i++) {
+      output_bit(PIN_D0 + i, 0);
+   }
+   output_low(SEGMENT_ENABLE);
+   output_low(DISP_DEZENA);
+   output_low(DISP_UNIDADE);
+}
+
+void mostra_digito(int8 valor, int1 dezena) {
+   for (int i = 0; i < 7; i++) {
+      output_bit(PIN_D0 + i, segmentos[valor][i]);
+   }
+   output_high(SEGMENT_ENABLE);
+
+   if (dezena) {
+      output_high(DISP_DEZENA);
+      delay_ms(5);
+      output_low(DISP_DEZENA);
+   } else {
+      output_high(DISP_UNIDADE);
+      delay_ms(5);
+      output_low(DISP_UNIDADE);
+   }
+
+   output_low(SEGMENT_ENABLE);
+}
+
+void mostra_display(int8 valor, unsigned int16 tempo_ms) {
+   int8 dez = valor / 10;
+   int8 uni = valor % 10;
+   unsigned int16 t = 0;
+
+   while (t < tempo_ms) {
+      mostra_digito(dez, TRUE);
+      t += 5;
+      mostra_digito(uni, FALSE);
+      t += 5;
+   }
+
+   display_off();
+}
+
+int1 botao_pressionado() {
+   if (!input(BOTAO)) {
+      delay_ms(20);
+      if (!input(BOTAO)) {
+         while (!input(BOTAO)) { delay_ms(10); }
+         return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+void estado_padrao() {
+   output_low(CARRO_VERMELHO);
+   output_low(CARRO_AMARELO);
+   output_high(CARRO_VERDE);
+
+   output_high(PED_VERMELHO);
+   output_low(PED_VERDE);
+
+   display_off();
+}
+
+// ---------- Programa principal ----------
+
+void main() {
+   unsigned long tempo = 20000UL;
+   unsigned long ultimo = 0UL;
+   unsigned long decorrido, wait;
+   unsigned int bloco;
+   int8 i;
+
+   setup_adc(ADC_OFF);
+   setup_adc_ports(NO_ANALOGS);
+
+   set_tris_b(0b00000001); // RB0 entrada, demais saída
+  
+   port_b_pullups(TRUE);
+   set_tris_d(0x00);       // PORTD como saída (segmentos + RD7)
+  
+   set_tris_a(0x00);       // RA4 e RA5 como saída (displays)
+   estado_padrao();
+
+   while (TRUE) {
+      if (botao_pressionado()) {
+         decorrido = (tempo >= ultimo) ? tempo - ultimo : 0UL;
+
+         if (decorrido < 20000UL) {
+            wait = 20000UL - decorrido;
+            while (wait) {
+               bloco = (wait >= 1000UL) ? 1000 : (unsigned int)wait;
+               delay_ms(bloco);
+               tempo += bloco;
+               wait -= bloco;
+            }
+         }
+
+         ultimo = tempo;
+
+         // 1) Carro amarelo 3s
+        
+         output_low(CARRO_VERDE);
+         output_high(CARRO_AMARELO);
+         delay_ms(3000);
+         tempo += 3000;
+         output_low(CARRO_AMARELO);
+
+         // 2) Carro vermelho 2s
+        
+         output_high(CARRO_VERMELHO);
+         delay_ms(2000);
+         tempo += 2000;
+
+         // 3) Pedestre verde 10s — contagem 15..6
+        
+         output_low(PED_VERMELHO);
+         output_high(PED_VERDE);
+         for (i = 15; i >= 6; i--) {
+            mostra_display(i, 1000);
+            tempo += 1000;
+         }
+
+         // 4) Últimos 5s: pisca enquanto conta 5..0
+        
+         for (i = 5; i != 255; i--) {
+            mostra_display(i, 500);
+            tempo += 500;
+            display_off();
+            delay_ms(500);
+            tempo += 500;
+         }
+
+
+         // 5) Pedestre volta vermelho imediatamente
+        
+         output_low(PED_VERDE);
+         output_high(PED_VERMELHO);
+         display_off();
+
+         // 6) Após 1s, retorna ao estado padrão
+        
+         delay_ms(1000);
+         tempo += 1000;
+         estado_padrao();
+         
+         // 7) Carro volta ao verde
+        
+         output_low(CARRO_VERMELHO);
+         output_high(CARRO_VERDE);
+      }
+
+      delay_ms(50);
+      tempo += 50;
+   }
+}
+

@@ -1,0 +1,73 @@
+#include <16F877A.h>
+
+// --- CONFIGURAÇÕES DO MICROCONTROLADOR ---
+#FUSES NOWDT, NOBROWNOUT, NOLVP, HS // HS para cristais de alta frequência (comum na PICGenios)
+#use delay(crystal=20000000)      // Usando um cristal de 20MHz
+
+// --- MAPA DE SEGMENTOS (CÁTODO COMUM) ---
+// Este array guarda o padrão de bits para acender cada número de 0 a 9.
+// O padrão é: Ponto-G-F-E-D-C-B-A
+byte const display_map[10] = {
+   0b00111111, // 0
+   0b00000110, // 1
+   0b01011011, // 2
+   0b01001111, // 3
+   0b01100110, // 4
+   0b01101101, // 5
+   0b01111101, // 6
+   0b00000111, // 7
+   0b01111111, // 8
+   0b01101111  // 9
+};
+
+// --- FUNÇÃO PRINCIPAL ---
+void main() {
+   // Configura os ports C e D como SAÍDA.
+   // PORTD envia o padrão dos segmentos.
+   // PORTC (pinos 0-3) seleciona qual display acender.
+   set_tris_d(0x00);
+   set_tris_c(0x00);
+   
+   unsigned int16 numero = 0; // Variável para o nosso contador (16 bits vai de 0 a 65535)
+   
+   // Variáveis para guardar cada dígito do número
+   byte milhar, centena, dezena, unidade;
+   
+   // Loop infinito
+   while (TRUE) {
+      
+      // 1. SEPARA O NÚMERO EM DÍGITOS INDIVIDUAIS
+      milhar  = (numero / 1000);
+      centena = (numero / 100) % 10;
+      dezena  = (numero / 10) % 10;
+      unidade = numero % 10;
+      
+      // 2. EXECUTA O CICLO DE MULTIPLEXAÇÃO
+      
+      // Acende o Display 1 (Milhar)
+      output_c(0b00000001); // Ativa RC0
+      output_d(display_map[milhar]);
+      delay_ms(5); // Mantém aceso por 5ms
+      
+      // Acende o Display 2 (Centena)
+      output_c(0b00000010); // Ativa RC1
+      output_d(display_map[centena]);
+      delay_ms(5);
+      
+      // Acende o Display 3 (Dezena)
+      output_c(0b00000100); // Ativa RC2
+      output_d(display_map[dezena]);
+      delay_ms(5);
+      
+      // Acende o Display 4 (Unidade)
+      output_c(0b00001000); // Ativa RC3
+      output_d(display_map[unidade]);
+      delay_ms(5);
+      
+      // 3. ATUALIZA O NÚMERO PARA O PRÓXIMO CICLO
+      numero++;
+      if (numero > 9999) {
+         numero = 0; // Reinicia o contador quando chegar em 10000
+      }
+   }
+}

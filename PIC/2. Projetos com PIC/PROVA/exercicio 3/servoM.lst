@@ -1,0 +1,485 @@
+CCS PCM C Compiler, Version 5.015, 5967               21-nov-25 16:38
+
+               Filename:   C:\Users\Monitor\Desktop\MicroCon\Projetos PCW\PROVA\exercicio 3\servoM.lst
+
+               ROM used:   280 words (3%)
+                           Largest free fragment is 2048
+               RAM used:   7 (2%) at main() level
+                           9 (2%) worst case
+               Stack used: 2 locations
+               Stack size: 8
+
+*
+0000:  MOVLW  00
+0001:  MOVWF  0A
+0002:  GOTO   0B0
+0003:  NOP
+.................... /* 
+....................  * ============================================================================== 
+....................  * PROJETO: Sequenciador de Servo Motor 
+....................  * PLACA ALVO: PICGenios (ou similar) 
+....................  * MICROCONTROLADOR: PIC16F877A 
+....................  * 
+....................  * DESCRIÇÃO: 
+....................  * Este programa controla um servo motor conectado ao pino RD2. 
+....................  * Ele usa PWM por SOFTWARE para mover o servo para posições angulares 
+....................  * específicas (0, 45, 90, 180 graus) em uma sequência pré-definida. 
+....................  * 
+....................  * TÉCNICA: 
+....................  * O controle do servo é feito enviando um pulso com uma largura 
+....................  * específica a cada 20ms (50Hz). 
+....................  * - ~800us  = 0 graus 
+....................  * - ~1500us = 90 graus 
+....................  * - ~2200us = 180 graus 
+....................  * ============================================================================== 
+....................  */ 
+....................  
+.................... #include <16F877A.h> // Biblioteca padrão do PIC16F877A 
+.................... //////////// Standard Header file for the PIC16F877A device //////////////// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... ////        (C) Copyright 1996, 2013 Custom Computer Services          //// 
+.................... //// This source code may only be used by licensed users of the CCS C  //// 
+.................... //// compiler.  This source code may only be distributed to other      //// 
+.................... //// licensed users of the CCS C compiler.  No other use, reproduction //// 
+.................... //// or distribution is permitted without written permission.          //// 
+.................... //// Derivative programs created using this software in object code    //// 
+.................... //// form are not restricted in any way.                               //// 
+.................... /////////////////////////////////////////////////////////////////////////// 
+.................... #device PIC16F877A 
+....................  
+.................... #list 
+....................  
+.................... #device adc=8        // Define ADC para 8 bits (não usado neste código) 
+....................  
+.................... // --- Configuração dos Fuses --- 
+.................... #FUSES NOWDT      // Desabilita o Watch Dog Timer 
+.................... #FUSES HS         // Oscilador High Speed (para o cristal de 20MHz) 
+.................... #FUSES NOPUT      // Desabilita o Power Up Timer 
+.................... #FUSES NOPROTECT  // Código não protegido contra leitura 
+.................... #FUSES NODEBUG    // Modo Debug desligado 
+.................... #FUSES NOBROWNOUT // Desabilita reset por queda de tensão 
+.................... #FUSES NOLVP      // Desabilita baixa tensão (libera pino RB3) 
+.................... #FUSES NOCPD      // Proteção de dados da EEPROM desligada 
+.................... #FUSES NOWRT      // Memória de programa não protegida contra escrita 
+.................... #FUSES RESERVED   // Bits de fuse reservados 
+....................  
+.................... // Informa ao compilador que o cristal é de 20MHz 
+.................... #use delay(clock=20000000) 
+0004:  MOVLW  03
+0005:  SUBWF  23,F
+0006:  BTFSS  03.0
+0007:  GOTO   012
+0008:  MOVLW  23
+0009:  MOVWF  04
+000A:  BCF    03.7
+000B:  MOVF   00,W
+000C:  BTFSC  03.2
+000D:  GOTO   012
+000E:  GOTO   010
+000F:  GOTO   010
+0010:  DECFSZ 00,F
+0011:  GOTO   00F
+0012:  RETURN
+0013:  MOVLW  22
+0014:  MOVWF  04
+0015:  BCF    03.7
+0016:  MOVF   00,W
+0017:  BTFSC  03.2
+0018:  GOTO   026
+0019:  MOVLW  06
+001A:  MOVWF  78
+001B:  CLRF   77
+001C:  DECFSZ 77,F
+001D:  GOTO   01C
+001E:  DECFSZ 78,F
+001F:  GOTO   01B
+0020:  MOVLW  7B
+0021:  MOVWF  77
+0022:  DECFSZ 77,F
+0023:  GOTO   022
+0024:  DECFSZ 00,F
+0025:  GOTO   019
+0026:  RETURN
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÕES DE POSICIONAMENTO DO SERVO 
+....................  * ============================================================================== 
+....................  * 
+....................  * O 'for' loop (i<100) é usado para MANTER o servo na posição. 
+....................  * Ele envia o mesmo pulso 100 vezes. 
+....................  * Cada pulso dura 20ms (ex: 800us + 19200us = 20000us = 20ms). 
+....................  * Tempo total da função = 100 * 20ms = 2000ms = 2 segundos. 
+....................  * Durante 2 segundos, a função "segura" o servo na posição desejada. 
+....................  */ 
+....................  
+.................... /* 
+....................  * Função: Rotation0 
+....................  * Move o servo para a posição de 0 graus. 
+....................  * Envia um pulso de 800 microssegundos (0.8ms). 
+....................  */ 
+.................... void Rotation0() //0 Degree 
+.................... { 
+....................     unsigned int i; 
+....................     for(i=0; i<100; i++) 
+0027:  CLRF   21
+0028:  MOVF   21,W
+0029:  SUBLW  63
+002A:  BTFSS  03.0
+002B:  GOTO   043
+....................     { 
+....................         output_high(PIN_A0); // Inicia o pulso 
+002C:  BSF    03.5
+002D:  BCF    05.0
+002E:  BCF    03.5
+002F:  BSF    05.0
+....................         delay_us(800);       // Largura do pulso para 0° 
+0030:  MOVLW  04
+0031:  MOVWF  22
+0032:  MOVLW  C7
+0033:  MOVWF  23
+0034:  CALL   004
+0035:  DECFSZ 22,F
+0036:  GOTO   032
+....................         output_low(PIN_A0);  // Termina o pulso 
+0037:  BSF    03.5
+0038:  BCF    05.0
+0039:  BCF    03.5
+003A:  BCF    05.0
+....................         delay_us(19200);     // Restante do período de 20ms (20000 - 800) 
+003B:  MOVLW  13
+003C:  MOVWF  22
+003D:  CALL   013
+003E:  MOVLW  C8
+003F:  MOVWF  23
+0040:  CALL   004
+0041:  INCF   21,F
+0042:  GOTO   028
+....................     } 
+0043:  BCF    0A.3
+0044:  BCF    0A.4
+0045:  GOTO   0F7 (RETURN)
+.................... } 
+....................  
+.................... /* 
+....................  * Função: Rotation45 
+....................  * Move o servo para a posição de 45 graus. 
+....................  * Envia um pulso de 1150 microssegundos (1.15ms). 
+....................  */ 
+.................... void Rotation45() //45 Degree 
+.................... { 
+....................     unsigned int i; 
+....................     for(i=0; i<100; i++) 
+*
+008E:  CLRF   21
+008F:  MOVF   21,W
+0090:  SUBLW  63
+0091:  BTFSS  03.0
+0092:  GOTO   0AD
+....................     { 
+....................         output_high(PIN_A0); // Inicia o pulso 
+0093:  BSF    03.5
+0094:  BCF    05.0
+0095:  BCF    03.5
+0096:  BSF    05.0
+....................         delay_us(1150);      // Largura do pulso para 45° 
+0097:  MOVLW  01
+0098:  MOVWF  22
+0099:  CALL   013
+009A:  MOVLW  96
+009B:  MOVWF  23
+009C:  CALL   004
+....................         output_low(PIN_A0);  // Termina o pulso 
+009D:  BSF    03.5
+009E:  BCF    05.0
+009F:  BCF    03.5
+00A0:  BCF    05.0
+....................         delay_us(18850);     // Restante do período de 20ms (20000 - 1150) 
+00A1:  MOVLW  12
+00A2:  MOVWF  22
+00A3:  CALL   013
+00A4:  MOVLW  05
+00A5:  MOVWF  22
+00A6:  MOVLW  A9
+00A7:  MOVWF  23
+00A8:  CALL   004
+00A9:  DECFSZ 22,F
+00AA:  GOTO   0A6
+00AB:  INCF   21,F
+00AC:  GOTO   08F
+....................     } 
+00AD:  BCF    0A.3
+00AE:  BCF    0A.4
+00AF:  GOTO   10F (RETURN)
+.................... } 
+....................  
+.................... /* 
+....................  * Função: Rotation90 
+....................  * Move o servo para a posição de 90 graus (posição central). 
+....................  * Envia um pulso de 1500 microssegundos (1.5ms). 
+....................  */ 
+.................... void Rotation90() //90 Degree 
+.................... { 
+....................     unsigned int i; 
+....................     for(i=0; i<100; i++) 
+*
+0046:  CLRF   21
+0047:  MOVF   21,W
+0048:  SUBLW  63
+0049:  BTFSS  03.0
+004A:  GOTO   069
+....................     { 
+....................         output_high(PIN_A0); // Inicia o pulso 
+004B:  BSF    03.5
+004C:  BCF    05.0
+004D:  BCF    03.5
+004E:  BSF    05.0
+....................         delay_us(1500);      // Largura do pulso para 90° 
+004F:  MOVLW  01
+0050:  MOVWF  22
+0051:  CALL   013
+0052:  MOVLW  02
+0053:  MOVWF  22
+0054:  MOVLW  F9
+0055:  MOVWF  23
+0056:  CALL   004
+0057:  DECFSZ 22,F
+0058:  GOTO   054
+....................         output_low(PIN_A0);  // Termina o pulso 
+0059:  BSF    03.5
+005A:  BCF    05.0
+005B:  BCF    03.5
+005C:  BCF    05.0
+....................         delay_us(18500);     // Restante do período de 20ms (20000 - 1500) 
+005D:  MOVLW  12
+005E:  MOVWF  22
+005F:  CALL   013
+0060:  MOVLW  02
+0061:  MOVWF  22
+0062:  MOVLW  F9
+0063:  MOVWF  23
+0064:  CALL   004
+0065:  DECFSZ 22,F
+0066:  GOTO   062
+0067:  INCF   21,F
+0068:  GOTO   047
+....................     } 
+0069:  BCF    0A.3
+006A:  BCF    0A.4
+006B:  GOTO   0FF (RETURN)
+.................... } 
+....................  
+.................... /* 
+....................  * Função: Rotation180 
+....................  * Move o servo para a posição de 180 graus. 
+....................  * Envia um pulso de 2200 microssegundos (2.2ms). 
+....................  */ 
+.................... void Rotation180() //180 Degree 
+.................... { 
+....................     unsigned int i; 
+....................     for(i=0; i<100; i++) 
+006C:  CLRF   21
+006D:  MOVF   21,W
+006E:  SUBLW  63
+006F:  BTFSS  03.0
+0070:  GOTO   08B
+....................     { 
+....................         output_high(PIN_A0); // Inicia o pulso 
+0071:  BSF    03.5
+0072:  BCF    05.0
+0073:  BCF    03.5
+0074:  BSF    05.0
+....................         delay_us(2200);      // Largura do pulso para 180° 
+0075:  MOVLW  02
+0076:  MOVWF  22
+0077:  CALL   013
+0078:  MOVLW  C8
+0079:  MOVWF  23
+007A:  CALL   004
+....................         output_low(PIN_A0);  // Termina o pulso 
+007B:  BSF    03.5
+007C:  BCF    05.0
+007D:  BCF    03.5
+007E:  BCF    05.0
+....................         delay_us(17800);     // Restante do período de 20ms (20000 - 2200) 
+007F:  MOVLW  11
+0080:  MOVWF  22
+0081:  CALL   013
+0082:  MOVLW  04
+0083:  MOVWF  22
+0084:  MOVLW  C7
+0085:  MOVWF  23
+0086:  CALL   004
+0087:  DECFSZ 22,F
+0088:  GOTO   084
+0089:  INCF   21,F
+008A:  GOTO   06D
+....................     } 
+008B:  BCF    0A.3
+008C:  BCF    0A.4
+008D:  GOTO   107 (RETURN)
+.................... } 
+....................  
+.................... /* 
+....................  * ============================================================================== 
+....................  * FUNÇÃO PRINCIPAL (main) 
+....................  * ============================================================================== 
+....................  */ 
+.................... void main() 
+*
+00B0:  MOVF   03,W
+00B1:  ANDLW  1F
+00B2:  MOVWF  03
+00B3:  MOVLW  FF
+00B4:  MOVWF  20
+00B5:  BSF    03.5
+00B6:  BSF    1F.0
+00B7:  BSF    1F.1
+00B8:  BSF    1F.2
+00B9:  BCF    1F.3
+00BA:  MOVLW  07
+00BB:  MOVWF  1C
+00BC:  BCF    03.7
+.................... { 
+....................     // --- Configuração dos Periféricos --- 
+....................     // Desliga todos os módulos que não serão usados neste projeto. 
+....................     setup_adc_ports(NO_ANALOGS); // Pinos como digitais 
+00BD:  BSF    1F.0
+00BE:  BSF    1F.1
+00BF:  BSF    1F.2
+00C0:  BCF    1F.3
+....................     setup_adc(ADC_OFF);          // Desliga módulo ADC 
+00C1:  BCF    03.5
+00C2:  BCF    1F.0
+....................     setup_psp(PSP_DISABLED); 
+00C3:  BSF    03.5
+00C4:  BCF    09.4
+....................     setup_spi(SPI_SS_DISABLED); 
+00C5:  BCF    03.5
+00C6:  BCF    14.5
+00C7:  BCF    20.5
+00C8:  MOVF   20,W
+00C9:  BSF    03.5
+00CA:  MOVWF  07
+00CB:  BCF    03.5
+00CC:  BSF    20.4
+00CD:  MOVF   20,W
+00CE:  BSF    03.5
+00CF:  MOVWF  07
+00D0:  BCF    03.5
+00D1:  BCF    20.3
+00D2:  MOVF   20,W
+00D3:  BSF    03.5
+00D4:  MOVWF  07
+00D5:  MOVLW  01
+00D6:  BCF    03.5
+00D7:  MOVWF  14
+00D8:  MOVLW  00
+00D9:  BSF    03.5
+00DA:  MOVWF  14
+....................     setup_timer_0(RTCC_INTERNAL|RTCC_DIV_1); 
+00DB:  MOVF   01,W
+00DC:  ANDLW  C7
+00DD:  IORLW  08
+00DE:  MOVWF  01
+....................     setup_timer_1(T1_DISABLED); 
+00DF:  BCF    03.5
+00E0:  CLRF   10
+....................     setup_timer_2(T2_DISABLED,0,1); 
+00E1:  MOVLW  00
+00E2:  MOVWF  78
+00E3:  MOVWF  12
+00E4:  MOVLW  00
+00E5:  BSF    03.5
+00E6:  MOVWF  12
+....................     setup_comparator(NC_NC_NC_NC); 
+00E7:  MOVLW  07
+00E8:  MOVWF  1C
+00E9:  MOVF   05,W
+00EA:  MOVWF  05
+00EB:  MOVLW  10
+00EC:  MOVWF  77
+00ED:  DECFSZ 77,F
+00EE:  GOTO   0ED
+00EF:  NOP
+00F0:  MOVF   1C,W
+00F1:  BCF    03.5
+00F2:  BCF    0D.6
+....................     setup_vref(FALSE); 
+00F3:  BSF    03.5
+00F4:  CLRF   1D
+....................  
+....................     // --- Loop Infinito (Sequência de Movimento) --- 
+....................     while(true) 
+....................     { 
+....................         // 1. Move o servo para 0 graus. 
+....................         //    (A função 'Rotation0' já dura 2 segundos) 
+....................         Rotation0();  
+00F5:  BCF    03.5
+00F6:  GOTO   027
+....................          
+....................         // 2. Espera mais 5 segundos (totalizando 7s em 0°) 
+....................         delay_ms(5000); 
+00F7:  MOVLW  14
+00F8:  MOVWF  21
+00F9:  MOVLW  FA
+00FA:  MOVWF  22
+00FB:  CALL   013
+00FC:  DECFSZ 21,F
+00FD:  GOTO   0F9
+....................          
+....................         // 3. Move o servo para 90 graus (dura 2 segundos) 
+....................         Rotation90();  
+00FE:  GOTO   046
+....................          
+....................         // 4. Espera mais 2 segundos (totalizando 4s em 90°) 
+....................         delay_ms(2000); 
+00FF:  MOVLW  08
+0100:  MOVWF  21
+0101:  MOVLW  FA
+0102:  MOVWF  22
+0103:  CALL   013
+0104:  DECFSZ 21,F
+0105:  GOTO   101
+....................          
+....................         // 5. Move o servo para 180 graus (dura 2 segundos) 
+....................         Rotation180();  
+0106:  GOTO   06C
+....................          
+....................         // 6. Espera mais 4 segundos (totalizando 6s em 180°) 
+....................         delay_ms(4000); 
+0107:  MOVLW  10
+0108:  MOVWF  21
+0109:  MOVLW  FA
+010A:  MOVWF  22
+010B:  CALL   013
+010C:  DECFSZ 21,F
+010D:  GOTO   109
+....................          
+....................         // 7. Move o servo para 45 graus (dura 2 segundos) 
+....................         Rotation45();  
+010E:  GOTO   08E
+....................          
+....................         // 8. Espera mais 2 segundos (totalizando 4s em 45°) 
+....................         delay_ms(2000); 
+010F:  MOVLW  08
+0110:  MOVWF  21
+0111:  MOVLW  FA
+0112:  MOVWF  22
+0113:  CALL   013
+0114:  DECFSZ 21,F
+0115:  GOTO   111
+0116:  GOTO   0F6
+....................          
+....................         /* 
+....................         // Bloco de código comentado pelo autor original 
+....................         Rotation75(); // 75 graus 
+....................         delay_ms(2000); 
+....................         */ 
+....................          
+....................     } // Fim do while(true), o ciclo recomeça 
+.................... } 
+0117:  SLEEP
+
+Configuration Fuses:
+   Word  1: 3F3A   HS NOWDT NOPUT NOBROWNOUT NOLVP NOCPD NOWRT NODEBUG NOPROTECT

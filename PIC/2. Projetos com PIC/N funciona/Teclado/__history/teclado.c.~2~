@@ -1,0 +1,16 @@
+#include "kbd_ext_board2.c
+#include "mod_lcd.c"
+
+
+#include <teclado.h>
+
+
+void main()
+{
+
+   while(TRUE)
+   {
+      //TODO: User Code
+   }
+
+}

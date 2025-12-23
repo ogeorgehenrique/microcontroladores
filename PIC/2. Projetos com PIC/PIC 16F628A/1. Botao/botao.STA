@@ -1,0 +1,45 @@
+
+ROM used:   84/2048 (4%)
+            84/2048 (4%) including unused fragments
+
+            0.1 Average locations per line
+            4.7 Average locations per statement
+
+RAM used:   6/224 (3%) at main() level
+            7/224 (3%) worst case
+
+Stack used: 1 worst case (1 in main + 0 for interrupts)
+Stack size: 8
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+   47    18 100  botao.c
+  518     0   0  ..\..\..\..\..\..\Program Files (x86)\PICC\Devices\16F628A.h
+----- -----
+  565    18 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     20  24    1             @delay_ms1
+0     60  71    1   352  3.3  main
+ Inline         0             @cinit1
+
+Program metrics:
+    Functions               1
+    Statements              18
+    Comments                105
+    Volume (V)              357
+    Difficulty (D)          3.0
+    Effort to implement (E) 1088
+    Time to implement (T)   1 minutes
+    Est Delivered Bugs (B)  0
+    Cyclomatic Complexity   4
+    Maintainability (MI)    84
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00003     4  0  
+00004-007FF    80  1964  
+
+
+
