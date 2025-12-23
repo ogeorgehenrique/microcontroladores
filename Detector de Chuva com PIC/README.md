@@ -25,7 +25,7 @@ O sistema lê o valor de tensão fornecido por um módulo sensor de chuva atrav�
 * **Fonte Ajustavel para protoboard**
 * **Protoboard 830 pinos**
 
-### Componentes Extras:**
+### Componentes Extras:
 * 2x LEDs (Indicadores de status)
 * Resistores e Jumpers
 
@@ -47,7 +47,9 @@ As conexões foram definidas via software da seguinte maneira:
 
 > **Nota:** Os pinos RW do LCD geralmente são aterrados (GND) se não definidos no código para escrita.
 
-Imagem do Projeto montado:
+## Imagem do Projeto montado:
+![IMG_4700](https://github.com/user-attachments/assets/ff29ac50-baea-4749-bf7f-b950e5c482dc)
+
 ![IMG_4699](https://github.com/user-attachments/assets/876b4bdc-08e4-4500-852c-5b702e1d2ab8)
 
 
