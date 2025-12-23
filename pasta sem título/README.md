@@ -1,68 +1,60 @@
-# Olá, sou [SEU NOME AQUI]! 👋
-### Estudante de Engenharia da Computação (IFMT) & Artista Visual
+# Projetos Virtuais de Microcontroladores com PICSIMLab
+![PIC](https://img.shields.io/badge/Microchip-PIC-crimson?style=for-the-badge&logo=microchip&logoColor=white)
+![C](https://img.shields.io/badge/C-00599C?style=for-the-badge&logo=c&logoColor=white)
+![PICSIMLab](https://img.shields.io/badge/Simulador-PICSIMLab-orange?style=for-the-badge)
+![CCS C](https://img.shields.io/badge/Compilador-CCS_C-green?style=for-the-badge)
 
-Bem-vindo ao meu portfólio de projetos acadêmicos e pessoais. Aqui eu combino a lógica da programação de baixo nível com a criatividade das artes visuais. Meus focos principais são **Sistemas Embarcados**, **IoT**, **Visão Computacional** e **Ciência de Dados**.
+Este repositório reúne uma coleção de **12 projetos práticos** desenvolvidos durante a disciplina de Microcontroladores. Todos os experimentos foram simulados no ambiente **PICSIMLab** (PIC Simulator Laboratory), utilizando as placas virtuais de desenvolvimento **McLab I** e **McLab II**.
 
----
+O objetivo foi explorar desde o controle básico de GPIOs até o uso de periféricos avançados como ADC, PWM, Timers e comunicação Serial.
 
-## 🛠️ Tecnologias e Ferramentas
+## Tecnologias e Ferramentas
 
-![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white)
-![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![PIC Microcontrollers](https://img.shields.io/badge/PIC-Microchip-red?style=for-the-badge)
-![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi)
-![YOLO](https://img.shields.io/badge/YOLO-Computer_Vision-green?style=for-the-badge)
+* **Simulador:** PICSIMLab (v0.8 ou superior)
+* **Microcontroladores:** PIC16F877A e PIC16F628A
+* **Placas Virtuais:** McLab I e McLab II
+* **Linguagem:** C (Compilador CCS)
 
----
+## Sobre o PICSIMLab e as Placas
 
-## 🚀 Projetos em Destaque
+O **PICSIMLab** é um emulador de placas de desenvolvimento em tempo real com depurador MPLAB X/avr-gdb integrado. Ele permite testar códigos em um ambiente seguro antes da implementação em hardware físico.
 
-### 🐮 Segmentação de Imagens Bovinas com YOLO
-* **Descrição:** Desenvolvimento de um modelo de Visão Computacional utilizando a arquitetura YOLO para segmentação da região dorsal de bovinos. Projeto base para artigo acadêmico apresentado no **SBIAgro 2025**.
-* **Tech:** Python, PyTorch, YOLOv8/v11.
+* **McLab I:** Placa didática focada no PIC16F628A, ideal para projetos compactos e testes de lógica básica.
+* **McLab II:** Placa mais robusta para o PIC16F877A, contendo periféricos como LCD, Displays de 7 segmentos, Matriz de LEDs e interfaces de motor.
 
-### ⚡ Eletrocardiograma (ECG) com Amplificadores Operacionais
-* **Descrição:** Projeto de hardware para captação e filtragem de sinais cardíacos. Envolve o desenvolvimento do circuito de instrumentação, filtros ativos e relatório técnico detalhado.
-* **Tech:** Eletrônica Analógica, OpAmps, Simulação de Circuitos.
+## Lista de Projetos
 
-### 🌧️ Detector de Chuva IoT com ESP32
-* **Descrição:** Sistema de monitoramento climático utilizando sensor de chuva e microcontrolador ESP32 (ESP-WROOM-32).
-* **Tech:** C++, Arduino IDE, ESP32.
+Abaixo estão listados os 12 experimentos funcionais contidos neste portfólio, ordenados por complexidade:
 
-### 📱 RP2040 Zero - Pitch de Produto
-* **Descrição:** Material técnico e de marketing para apresentação da placa RP2040 Zero, destacando diferenciais como USB-C, tamanho reduzido e uso do MicroPython. Inclui guia de instalação de firmware e exemplos de código.
-* **Tech:** MicroPython, Thonny IDE, Estratégia de Produto.
+### 1. Básico (GPIO e Lógica)
+* **01 - Pisca-Pisca LED:** O "Hello World" do hardware. Controle de temporização e acionamento de saídas digitais.
+* **02 - Botão e LED:** Leitura de entradas digitais (botões) para controle condicional de saídas.
+* **03 - Semáforo:** Simulação de um cruzamento utilizando lógica sequencial e temporizadores (delay).
 
----
+### 2. Displays e Interface Homem-Máquina (IHM)
+* **04 - Display de 7 Segmentos:** Multiplexação e exibição de contadores numéricos.
+* **05 - LCD "Olá Mundo":** Inicialização e escrita de caracteres em displays de cristal líquido (16x2).
+* **06 - LCD + Conversor AD:** Leitura de sensores analógicos e exibição dos valores processados no LCD.
 
-## 💾 Coleção de Firmwares PIC16F877A
-Exercícios e drivers desenvolvidos para a placa de desenvolvimento **PICGenios** utilizando **CCS C Compiler**.
+### 3. Temporização e PWM (Pulse Width Modulation)
+* **07 - Timer Zero:** Configuração de interrupções de tempo precisas usando o Timer0 interno.
+* **08 - PWM Cooler (Potenciômetro):** Controle de velocidade de uma ventoinha variando o *Duty Cycle* via entrada analógica.
+* **09 - PWM Cooler (Fade-in):** Algoritmo de suavização para acelerar a ventoinha gradualmente (rampa de aceleração).
 
-| Projeto | Descrição Técnica | Hardware Utilizado |
-| :--- | :--- | :--- |
-| **Controlador de Motor de Passo** | Controle de velocidade (30 RPM preciso) e inversão de sentido via interrupção externa. | Motor de Passo, Driver ULN2003 |
-| **Multitarefa (Time Slicing)** | Lógica "Fibonacci" para piscar 6 LEDs em frequências diferentes simultaneamente sem travar o processador. | LEDs PORTD |
-| **Serial para LCD** | Sistema que recebe dados via UART (RS232) e classifica no LCD se é Número ou Letra (Tabela ASCII). | LCD 16x2, Módulo Serial |
-| **PWM via Hardware (CCP)** | Controle de Motor DC com rampa de aceleração (Soft-Start) e frenagem (Soft-Stop). | Motor DC, Módulo CCP1 |
-| **Sequenciador de Servo** | Controle de posicionamento angular (0°, 45°, 90°, 180°) utilizando PWM via Software. | Servo Motor SG90 |
-| **Timer 0 Interrupt** | Pisca-pisca de alta frequência utilizando estouro de timer e interrupções. | Timer 0 |
+### 4. Controle de Motores e Atuadores
+* **10 - Motor de Passo:** Acionamento sequencial de bobinas para controle preciso de posição.
+* **11 - Servo Motor:** Controle de ângulo de eixo utilizando pulsos PWM específicos (geralmente 50Hz).
 
----
+### 5. Comunicação
+* **12 - Comunicação Serial (UART):** Transmissão e recepção de dados entre o microcontrolador e um terminal virtual (ex: Computador).
 
-## 📊 Ciência de Dados e Algoritmos
+## Como Executar
 
-* **Mineração de Dados (Traffic Volume):** Análise do dataset "Metro Interstate Traffic Volume" aplicando técnicas de regressão e classificação.
-* **Algoritmos de Clusterização:** Estudo comparativo de métricas como Jaccard e Rand Index.
-* **Método da Bisseção:** Implementação em Python de algoritmos numéricos para encontrar raízes de funções.
-
----
-
-## 🎨 Sobre Mim
-Além da engenharia, sou artista visual com trabalhos exibidos na **Bienal da UNE (Rio de Janeiro, 2023)** e murais em Cuiabá. Essa bagagem artística me permite ter uma visão diferenciada sobre design de interfaces, visualização de dados e criatividade na resolução de problemas de engenharia.
+Para testar qualquer um dos projetos:
+1.  Tenha o **PICSIMLab** instalado.
+2.  Carregue o arquivo `.hex` correspondente ao projeto desejado.
+3.  Selecione a placa correta (**McLab I** para 16F628A ou **McLab II** para 16F877A) no menu do simulador.
+4.  Ative a simulação.
 
 ---
-
-### 📫 Contato
-* **LinkedIn:** [Coloque seu Link]
-* **Email:** [Coloque seu Email]
+*Projetos desenvolvidos para a disciplina de Microcontroladores.*
