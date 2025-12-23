@@ -1,4 +1,7 @@
 # Projeto: Sensor Detector de Chuva com PIC16F877A
+![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white)
+![PIC Microcontrollers](https://img.shields.io/badge/PIC-Microchip-red?style=for-the-badge)
+
 
 Este projeto faz parte de uma série de estudos para a disciplina de microcontroladores. O objetivo é desenvolver um sistema de monitoramento ambiental capaz de detectar a presença de água/chuva utilizando um sensor analógico/digital e exibir os dados processados em um display LCD.
 
