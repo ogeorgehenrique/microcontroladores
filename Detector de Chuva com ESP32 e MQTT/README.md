@@ -1,68 +1,70 @@
-# Olá, sou [SEU NOME AQUI]! 👋
-### Estudante de Engenharia da Computação (IFMT) & Artista Visual
+# Detector de Chuva IoT com ESP32 e MQTT
 
-Bem-vindo ao meu portfólio de projetos acadêmicos e pessoais. Aqui eu combino a lógica da programação de baixo nível com a criatividade das artes visuais. Meus focos principais são **Sistemas Embarcados**, **IoT**, **Visão Computacional** e **Ciência de Dados**.
+Este projeto expande os estudos de microcontroladores para a área de IoT (Internet das Coisas). O objetivo foi criar um sistema conectado que monitora níveis de chuva e envia os dados em tempo real para um Dashboard Web via protocolo MQTT.
+
+## Sobre o Projeto
+
+Diferente do projeto anterior com PIC (que exibia dados localmente), este sistema utiliza o **ESP32** para conectar-se à rede Wi-Fi. Ele lê um sensor de chuva analógico e publica os dados em um **Broker MQTT** público (HiveMQ).
+
+Uma página web (`dashboard.html`) atua como cliente, assinando o tópico para receber os dados e plotar um gráfico dinâmico em tempo real utilizando a biblioteca Highcharts.
+
+## Hardware Utilizado
+
+* **Microcontrolador:** ESP32 (DevKit V1)
+* **Sensor:** Módulo Sensor de Chuva (Saída Analógica)
+* **Atuador:** LED (Para feedback remoto)
+* **Conectividade:** Wi-Fi 2.4GHz
+
+# Imagem da montagem do Circuito
+
+![IMG_4702](https://github.com/user-attachments/assets/d39f67aa-a351-4ae5-a782-e1c6750bce25)
+
+
+## Pinagem e Conexões
+
+As conexões físicas definidas no firmware são:
+
+| Componente | Pino do Componente | Pino do ESP32 (GPIO) | Definição no Código |
+| :--- | :--- | :--- | :--- |
+| **Sensor Chuva** | Saída Analógica (AO) | **GPIO 36 (VP)** | `const int pinoSensor = 36;`|
+| **LED Status** | Anodo (+) | **GPIO 26** | `const int pinoLED = 26;` |
+
+## Arquitetura MQTT
+
+O sistema utiliza o protocolo MQTT (Message Queuing Telemetry Transport) com a seguinte configuração:
+
+* **Broker:** `broker.hivemq.com`
+* **Porta ESP32 (TCP):** `1883`
+* **Porta Dashboard (WebSocket):** `8000` (Usado pelo JavaScript/Paho)
+* **Tópicos:**
+    * **Publicação (Envio):** `george/sensor/chuva` (Dados do sensor)
+    * **Subscrição (Comando):** `george/sensor/led` (Controle do LED)
+
+## Funcionamento do Firmware (ESP32)
+
+1.  **Conexão:** O ESP32 conecta-se ao Wi-Fi ("GEORGE") e em seguida ao Broker MQTT.
+2.  **Leitura e Tratamento:**
+    * O ADC do ESP32 tem resolução de 12 bits (0 a 4095).
+    * Como o sensor de chuva é resistivo (tensão cai quando molha), o código inverte a lógica para tornar a leitura intuitiva (maior valor = mais chuva):
+        $$NivelChuva = 4095 - LeituraAnalogica$$
+3.  **Envio de Dados:** A cada **2 segundos** (definido por `MSG_INTERVAL`), o ESP32 publica o valor tratado no tópico `george/sensor/chuva`.
+4.  **Controle Remoto:** O ESP32 fica escutando o tópico `george/sensor/led`. Se receber `'1'`, liga o LED; se receber `'0'`, desliga.
+
+## Funcionamento do Dashboard (Web)
+
+O arquivo `dashboard.html` roda no navegador e funciona da seguinte forma:
+
+1.  **WebSockets:** Conecta ao mesmo Broker HiveMQ usando a porta **8000** (suporte a MQTT via WebSocket).
+2.  **Gráfico em Tempo Real:** Utiliza a biblioteca **Highcharts**.
+3.  **Atualização:** Sempre que uma nova mensagem chega no tópico, a função `onMessageArrived` converte o texto para número e adiciona um ponto ao gráfico, mantendo um histórico visual dos últimos 20 pontos de leitura.
+
+## Como Executar
+
+1. Carregue o código `.ino` no seu ESP32.
+2. Conecte no `broker.hivemq.com` com as informçoes contidas dentro do código `.ino`
+3. Abra o arquivo `dashboard.html` em qualquer navegador moderno.
+4.  Assim que o ESP32 conectar (LEDs do módulo podem indicar), o status no site mudará para "Conectado" e o gráfico começará a ser desenhado.
+
 
 ---
-
-## 🛠️ Tecnologias e Ferramentas
-
-![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white)
-![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![PIC Microcontrollers](https://img.shields.io/badge/PIC-Microchip-red?style=for-the-badge)
-![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi)
-![YOLO](https://img.shields.io/badge/YOLO-Computer_Vision-green?style=for-the-badge)
-
----
-
-## 🚀 Projetos em Destaque
-
-### 🐮 Segmentação de Imagens Bovinas com YOLO
-* **Descrição:** Desenvolvimento de um modelo de Visão Computacional utilizando a arquitetura YOLO para segmentação da região dorsal de bovinos. Projeto base para artigo acadêmico apresentado no **SBIAgro 2025**.
-* **Tech:** Python, PyTorch, YOLOv8/v11.
-
-### ⚡ Eletrocardiograma (ECG) com Amplificadores Operacionais
-* **Descrição:** Projeto de hardware para captação e filtragem de sinais cardíacos. Envolve o desenvolvimento do circuito de instrumentação, filtros ativos e relatório técnico detalhado.
-* **Tech:** Eletrônica Analógica, OpAmps, Simulação de Circuitos.
-
-### 🌧️ Detector de Chuva IoT com ESP32
-* **Descrição:** Sistema de monitoramento climático utilizando sensor de chuva e microcontrolador ESP32 (ESP-WROOM-32).
-* **Tech:** C++, Arduino IDE, ESP32.
-
-### 📱 RP2040 Zero - Pitch de Produto
-* **Descrição:** Material técnico e de marketing para apresentação da placa RP2040 Zero, destacando diferenciais como USB-C, tamanho reduzido e uso do MicroPython. Inclui guia de instalação de firmware e exemplos de código.
-* **Tech:** MicroPython, Thonny IDE, Estratégia de Produto.
-
----
-
-## 💾 Coleção de Firmwares PIC16F877A
-Exercícios e drivers desenvolvidos para a placa de desenvolvimento **PICGenios** utilizando **CCS C Compiler**.
-
-| Projeto | Descrição Técnica | Hardware Utilizado |
-| :--- | :--- | :--- |
-| **Controlador de Motor de Passo** | Controle de velocidade (30 RPM preciso) e inversão de sentido via interrupção externa. | Motor de Passo, Driver ULN2003 |
-| **Multitarefa (Time Slicing)** | Lógica "Fibonacci" para piscar 6 LEDs em frequências diferentes simultaneamente sem travar o processador. | LEDs PORTD |
-| **Serial para LCD** | Sistema que recebe dados via UART (RS232) e classifica no LCD se é Número ou Letra (Tabela ASCII). | LCD 16x2, Módulo Serial |
-| **PWM via Hardware (CCP)** | Controle de Motor DC com rampa de aceleração (Soft-Start) e frenagem (Soft-Stop). | Motor DC, Módulo CCP1 |
-| **Sequenciador de Servo** | Controle de posicionamento angular (0°, 45°, 90°, 180°) utilizando PWM via Software. | Servo Motor SG90 |
-| **Timer 0 Interrupt** | Pisca-pisca de alta frequência utilizando estouro de timer e interrupções. | Timer 0 |
-
----
-
-## 📊 Ciência de Dados e Algoritmos
-
-* **Mineração de Dados (Traffic Volume):** Análise do dataset "Metro Interstate Traffic Volume" aplicando técnicas de regressão e classificação.
-* **Algoritmos de Clusterização:** Estudo comparativo de métricas como Jaccard e Rand Index.
-* **Método da Bisseção:** Implementação em Python de algoritmos numéricos para encontrar raízes de funções.
-
----
-
-## 🎨 Sobre Mim
-Além da engenharia, sou artista visual com trabalhos exibidos na **Bienal da UNE (Rio de Janeiro, 2023)** e murais em Cuiabá. Essa bagagem artística me permite ter uma visão diferenciada sobre design de interfaces, visualização de dados e criatividade na resolução de problemas de engenharia.
-
----
-
-### 📫 Contato
-* **LinkedIn:** [Coloque seu Link]
-* **Email:** [Coloque seu Email]
+*Desenvolvido durante a disciplina de Microcontroladores - Engenharia da Computação.*
