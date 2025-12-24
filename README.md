@@ -1,68 +1,88 @@
-# Olá, sou [SEU NOME AQUI]! 👋
-### Estudante de Engenharia da Computação (IFMT) & Artista Visual
+# Microcontroladores
 
-Bem-vindo ao meu portfólio de projetos acadêmicos e pessoais. Aqui eu combino a lógica da programação de baixo nível com a criatividade das artes visuais. Meus focos principais são **Sistemas Embarcados**, **IoT**, **Visão Computacional** e **Ciência de Dados**.
+Este repositório centraliza os projetos práticos desenvolvidos durante a disciplina de **Microcontroladores** (Engenharia da Computação).
 
----
+O objetivo deste portfólio é demonstrar a progressão no domínio de sistemas embarcados, partindo da arquitetura básica e manipulação de registradores (PIC) até aplicações conectadas de Internet das Coisas (IoT) e controle via Bluetooth (ESP32).
 
-## 🛠️ Tecnologias e Ferramentas
+## Tecnologias e Ferramentas
 
+Abaixo estão as principais tecnologias, linguagens e ferramentas utilizadas ao longo de todos os projetos:
+
+### Hardware & Microcontroladores
+![PIC](https://img.shields.io/badge/Microchip-PIC-crimson?style=for-the-badge&logo=microchip&logoColor=white)
+![ESP32](https://img.shields.io/badge/ESP32-323330?style=for-the-badge&logo=espressif&logoColor=white)
+![Arduino](https://img.shields.io/badge/Arduino_Hardware-00979D?style=for-the-badge&logo=arduino&logoColor=white)
+![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi)
+
+### Linguagens de Programação
 ![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white)
 ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-![PIC Microcontrollers](https://img.shields.io/badge/PIC-Microchip-red?style=for-the-badge)
-![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi)
-![YOLO](https://img.shields.io/badge/YOLO-Computer_Vision-green?style=for-the-badge)
+
+### IoT, Web & Conectividade
+![MQTT](https://img.shields.io/badge/MQTT-3C276D?style=for-the-badge&logo=mqtt&logoColor=white)
+![HiveMQ](https://img.shields.io/badge/HiveMQ-f4e11e?style=for-the-badge&logo=hivemq&logoColor=black)
+![Bluetooth](https://img.shields.io/badge/Bluetooth_BLE-0082FC?style=for-the-badge&logo=bluetooth&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### Softwares e Ferramentas
+![CCS C](https://img.shields.io/badge/CCS_C_Compiler-green?style=for-the-badge)
+![PICSIMLab](https://img.shields.io/badge/Simulador-PICSIMLab-orange?style=for-the-badge)
+![RemoteXY](https://img.shields.io/badge/RemoteXY-App_Interface-orange?style=for-the-badge)
+
 
 ---
 
-## 🚀 Projetos em Destaque
+## Índice de Projetos
 
-### 🐮 Segmentação de Imagens Bovinas com YOLO
-* **Descrição:** Desenvolvimento de um modelo de Visão Computacional utilizando a arquitetura YOLO para segmentação da região dorsal de bovinos. Projeto base para artigo acadêmico apresentado no **SBIAgro 2025**.
-* **Tech:** Python, PyTorch, YOLOv8/v11.
+### 1. [Detector de Chuva (PIC16F877A)](./01_Sensor_Chuva_PIC)
+**Foco:** Conversão A/D e Interface Local (LCD).
+O primeiro projeto da série. Um sistema stand-alone que utiliza um sensor resistivo para medir a intensidade de chuva e exibe a porcentagem de umidade em um display LCD 16x2.
+* **Destaques:** Leitura ADC de 10 bits, multiplexação de LCD, programação em C (CCS).
 
-### ⚡ Eletrocardiograma (ECG) com Amplificadores Operacionais
-* **Descrição:** Projeto de hardware para captação e filtragem de sinais cardíacos. Envolve o desenvolvimento do circuito de instrumentação, filtros ativos e relatório técnico detalhado.
-* **Tech:** Eletrônica Analógica, OpAmps, Simulação de Circuitos.
+### 2. [Monitoramento IoT via MQTT (ESP32)](./02_Sensor_Chuva_IoT)
+**Foco:** IoT, Protocolo MQTT e Dashboards Web.
+Evolução do projeto anterior. Substituímos a exibição local por um envio de dados para a nuvem. O ESP32 coleta os dados do sensor e publica em um Broker MQTT. Um dashboard web (HTML/JS) consome esses dados para gerar gráficos em tempo real.
+* **Destaques:** Conexão Wi-Fi, HiveMQ, WebSockets, Biblioteca Highcharts.
 
-### 🌧️ Detector de Chuva IoT com ESP32
-* **Descrição:** Sistema de monitoramento climático utilizando sensor de chuva e microcontrolador ESP32 (ESP-WROOM-32).
-* **Tech:** C++, Arduino IDE, ESP32.
+### 3. [Laboratório Virtual (PICSIMLab)](./03_Laboratorio_PICSIMLab)
+**Foco:** Simulação, Periféricos e Lógica de Hardware.
+Uma coleção de **12 experimentos** simulados nas placas McLab I e II. Abrange desde o "Hello World" (Pisca LED) até controles complexos como PWM, Timers e Comunicação Serial.
+* **Destaques:** Projetos funcionais simulados sem necessidade de hardware físico imediato.
 
-### 📱 RP2040 Zero - Pitch de Produto
-* **Descrição:** Material técnico e de marketing para apresentação da placa RP2040 Zero, destacando diferenciais como USB-C, tamanho reduzido e uso do MicroPython. Inclui guia de instalação de firmware e exemplos de código.
-* **Tech:** MicroPython, Thonny IDE, Estratégia de Produto.
-
----
-
-## 💾 Coleção de Firmwares PIC16F877A
-Exercícios e drivers desenvolvidos para a placa de desenvolvimento **PICGenios** utilizando **CCS C Compiler**.
-
-| Projeto | Descrição Técnica | Hardware Utilizado |
-| :--- | :--- | :--- |
-| **Controlador de Motor de Passo** | Controle de velocidade (30 RPM preciso) e inversão de sentido via interrupção externa. | Motor de Passo, Driver ULN2003 |
-| **Multitarefa (Time Slicing)** | Lógica "Fibonacci" para piscar 6 LEDs em frequências diferentes simultaneamente sem travar o processador. | LEDs PORTD |
-| **Serial para LCD** | Sistema que recebe dados via UART (RS232) e classifica no LCD se é Número ou Letra (Tabela ASCII). | LCD 16x2, Módulo Serial |
-| **PWM via Hardware (CCP)** | Controle de Motor DC com rampa de aceleração (Soft-Start) e frenagem (Soft-Stop). | Motor DC, Módulo CCP1 |
-| **Sequenciador de Servo** | Controle de posicionamento angular (0°, 45°, 90°, 180°) utilizando PWM via Software. | Servo Motor SG90 |
-| **Timer 0 Interrupt** | Pisca-pisca de alta frequência utilizando estouro de timer e interrupções. | Timer 0 |
+### 4. [Controle de Motor via Bluetooth (ESP32)](./04_Controle_Motor_BLE)
+**Foco:** Conectividade BLE, Controle de Potência (PWM) e App Mobile.
+Sistema de controle remoto para motores DC. Utiliza o Bluetooth Low Energy do ESP32 para se comunicar com um aplicativo de celular (RemoteXY), permitindo ajuste de velocidade e rotação na palma da mão.
+* **Destaques:** Ponte H L298N, PWM de 8 bits, Interface Gráfica Mobile personalizada.
 
 ---
 
-## 📊 Ciência de Dados e Algoritmos
+## Como Utilizar este Repositório
 
-* **Mineração de Dados (Traffic Volume):** Análise do dataset "Metro Interstate Traffic Volume" aplicando técnicas de regressão e classificação.
-* **Algoritmos de Clusterização:** Estudo comparativo de métricas como Jaccard e Rand Index.
-* **Método da Bisseção:** Implementação em Python de algoritmos numéricos para encontrar raízes de funções.
+Cada pasta listada acima contém seu próprio arquivo `README.md` detalhado, o código fonte (`.c`, `.ino`) e os esquemas de ligação necessários. Navegue pelos links do índice para ver os detalhes técnicos de implementação de cada projeto.
 
 ---
+*Desenvolvido por George Henrique - Estudante de Engenharia da Computação.*
 
-## 🎨 Sobre Mim
-Além da engenharia, sou artista visual com trabalhos exibidos na **Bienal da UNE (Rio de Janeiro, 2023)** e murais em Cuiabá. Essa bagagem artística me permite ter uma visão diferenciada sobre design de interfaces, visualização de dados e criatividade na resolução de problemas de engenharia.
 
----
-
-### 📫 Contato
-* **LinkedIn:** [Coloque seu Link]
-* **Email:** [Coloque seu Email]
+📁 Meu_Portfolio_Microcontroladores
+│
+├── 📄 README.md
+│
+├── 📁 01_Sensor_Chuva_PIC
+│   ├── main.c
+│   └── README.md
+│
+├── 📁 02_Sensor_Chuva_IoT
+│   ├── sensor.ino
+│   ├── dashboard.html
+│   └── README.md
+│
+├── 📁 03_Laboratorio_PICSIMLab
+│   ├── (Seus 12 códigos .c ou .hex)
+│   └── README.md
+│
+└── 📁 04_Controle_Motor_BLE
+    ├── motor.ino
+    └── README.md
