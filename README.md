@@ -36,22 +36,22 @@ Abaixo estão as principais tecnologias, linguagens e ferramentas utilizadas ao 
 
 ## Índice de Projetos
 
-### 1. [Detector de Chuva (PIC16F877A)](./01_Sensor_Chuva_PIC)
+### 1. [Detector de Chuva (PIC16F877A)](https://github.com/ogeorgehenrique/microcontroladores/tree/main/PIC/1.%20Detector%20de%20Chuva%20com%20PIC)
 **Foco:** Conversão A/D e Interface Local (LCD).
 O primeiro projeto da série. Um sistema stand-alone que utiliza um sensor resistivo para medir a intensidade de chuva e exibe a porcentagem de umidade em um display LCD 16x2.
 * **Destaques:** Leitura ADC de 10 bits, multiplexação de LCD, programação em C (CCS).
 
-### 2. [Monitoramento IoT via MQTT (ESP32)](./02_Sensor_Chuva_IoT)
+### 2. [Monitoramento IoT via MQTT (ESP32)](https://github.com/ogeorgehenrique/microcontroladores/tree/main/ESP32/1.%20Detector%20de%20Chuva%20com%20ESP32%20e%20MQTT)
 **Foco:** IoT, Protocolo MQTT e Dashboards Web.
 Evolução do projeto anterior. Substituímos a exibição local por um envio de dados para a nuvem. O ESP32 coleta os dados do sensor e publica em um Broker MQTT. Um dashboard web (HTML/JS) consome esses dados para gerar gráficos em tempo real.
 * **Destaques:** Conexão Wi-Fi, HiveMQ, WebSockets, Biblioteca Highcharts.
 
-### 3. [Laboratório Virtual (PICSIMLab)](./03_Laboratorio_PICSIMLab)
+### 3. [Laboratório Virtual (PICSIMLab)](https://github.com/ogeorgehenrique/microcontroladores/tree/main/PIC/2.%20Projetos%20com%20PIC)
 **Foco:** Simulação, Periféricos e Lógica de Hardware.
 Uma coleção de **12 experimentos** simulados nas placas McLab I e II. Abrange desde o "Hello World" (Pisca LED) até controles complexos como PWM, Timers e Comunicação Serial.
 * **Destaques:** Projetos funcionais simulados sem necessidade de hardware físico imediato.
 
-### 4. [Controle de Motor via Bluetooth (ESP32)](./04_Controle_Motor_BLE)
+### 4. [Controle de Motor via Bluetooth (ESP32)](https://github.com/ogeorgehenrique/microcontroladores/tree/b67841987c2a7bb80415f9f469e074c31d455382/ESP32/2.%20Motor%20Bluetooth.i)
 **Foco:** Conectividade BLE, Controle de Potência (PWM) e App Mobile.
 Sistema de controle remoto para motores DC. Utiliza o Bluetooth Low Energy do ESP32 para se comunicar com um aplicativo de celular (RemoteXY), permitindo ajuste de velocidade e rotação na palma da mão.
 * **Destaques:** Ponte H L298N, PWM de 8 bits, Interface Gráfica Mobile personalizada.
@@ -64,25 +64,3 @@ Cada pasta listada acima contém seu próprio arquivo `README.md` detalhado, o c
 
 ---
 *Desenvolvido por George Henrique - Estudante de Engenharia da Computação.*
-
-
-📁 Meu_Portfolio_Microcontroladores
-│
-├── 📄 README.md
-│
-├── 📁 01_Sensor_Chuva_PIC
-│   ├── main.c
-│   └── README.md
-│
-├── 📁 02_Sensor_Chuva_IoT
-│   ├── sensor.ino
-│   ├── dashboard.html
-│   └── README.md
-│
-├── 📁 03_Laboratorio_PICSIMLab
-│   ├── (Seus 12 códigos .c ou .hex)
-│   └── README.md
-│
-└── 📁 04_Controle_Motor_BLE
-    ├── motor.ino
-    └── README.md
